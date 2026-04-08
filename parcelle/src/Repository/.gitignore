@@ -1,0 +1,11 @@
+*.php~
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+.project
+.buildpath
+.tmproj

@@ -1,0 +1,147 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Plantes{% endblock %}
+
+{% block page_id %}plantes{% endblock %}
+
+{% block body %}
+<section class="scene-page" style="--step-count: {{ sceneParcelles|length > 0 ? sceneParcelles|length : 1 }}">
+    <div class="page-corner-actions">
+        <div class="action-row">
+            <a href="{{ path('app_plante_new') }}" class="button-secondary"><i class="bi bi-plus-circle"></i> Nouvelle plante</a>
+            <a href="{{ path('app_plante_export_pdf') }}" class="button-secondary"><i class="bi bi-file-earmark-pdf"></i> Export PDF</a>
+        </div>
+    </div>
+    <section class="page-panel mb-4 reveal">
+        <div class="section-head">
+            <div>
+                <div class="section-kicker"><i class="bi bi-sliders"></i> Recherche, tri et statistiques</div>
+                <h1 class="h3 mt-3 mb-1">Vue des plantes</h1>
+                <p class="muted mb-0">Affinez la liste et gardez les statistiques principales visibles au-dessus de la scene.</p>
+            </div>
+        </div>
+        <form method="get" class="search-form">
+            <div class="content-grid align-items-end">
+                <div class="span-5">
+                    <label for="search">Recherche</label>
+                    <input id="search" name="search" type="text" class="form-control" value="{{ search }}" placeholder="Nom, type, parcelle, proprietaire..." />
+                </div>
+                <div class="span-3">
+                    <label for="sort">Tri</label>
+                    <select id="sort" name="sort" class="form-select">
+                        <option value="idPlante" {{ sort == 'idPlante' ? 'selected' : '' }}>ID</option>
+                        <option value="nom" {{ sort == 'nom' ? 'selected' : '' }}>Nom</option>
+                        <option value="type" {{ sort == 'type' ? 'selected' : '' }}>Type</option>
+                        <option value="quantite" {{ sort == 'quantite' ? 'selected' : '' }}>Quantite</option>
+                        <option value="surface" {{ sort == 'surface' ? 'selected' : '' }}>Surface</option>
+                        <option value="parcelle" {{ sort == 'parcelle' ? 'selected' : '' }}>Parcelle</option>
+                    </select>
+                </div>
+                <div class="span-2">
+                    <label for="direction">Ordre</label>
+                    <select id="direction" name="direction" class="form-select">
+                        <option value="ASC" {{ direction == 'ASC' ? 'selected' : '' }}>Croissant</option>
+                        <option value="DESC" {{ direction == 'DESC' ? 'selected' : '' }}>Decroissant</option>
+                    </select>
+                </div>
+                <div class="span-2">
+                    <div class="stack-sm">
+                        <button type="submit" class="button-primary w-100"><i class="bi bi-search"></i> Filtrer</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="metric-grid mt-4">
+            <article class="data-card">
+                <div class="metric-label">Total plantes</div>
+                <div class="metric-value">{{ stats.total }}</div>
+            </article>
+            <article class="data-card">
+                <div class="metric-label">Surface totale</div>
+                <div class="metric-value">{{ stats.totalSurface|number_format(2) }}</div>
+                <div class="muted">m²</div>
+            </article>
+            <article class="data-card">
+                <div class="metric-label">Surface moyenne</div>
+                <div class="metric-value">{{ stats.avgSurface|number_format(2) }}</div>
+                <div class="muted">m²</div>
+            </article>
+            <article class="data-card">
+                <div class="metric-label">Type dominant</div>
+                <div class="metric-value">{{ stats.types is not empty ? stats.types|first.type : 'N/A' }}</div>
+                <div class="muted">{{ stats.types is not empty ? stats.types|first.count ~ ' plantes' : 'Aucune donnee' }}</div>
+            </article>
+        </div>
+    </section>
+    <div class="scene-steps">
+        {% for parcelle in sceneParcelles %}
+            <article class="scene-step" data-scene-id="{{ parcelle.id }}">
+                <div class="section-kicker"><i class="bi bi-pin-map"></i> Parcelle {{ parcelle.id }}</div>
+                <h2 class="h3 mt-3 mb-1">{{ parcelle.proprietaire }}</h2>
+                <p class="muted mb-3">{{ parcelle.localisation }} • {{ parcelle.typeDeSol }}</p>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="section-kicker"><i class="bi bi-flower3"></i> Plantes</div>
+                        <div class="h4 mt-2 mb-0">{{ parcelle.plantCount }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="section-kicker"><i class="bi bi-aspect-ratio"></i> Surface</div>
+                        <div class="h5 mt-2 mb-0">{{ parcelle.superficie ? parcelle.superficie|number_format(2) : '0.00' }} m²</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="section-kicker"><i class="bi bi-rulers"></i> Dimensions</div>
+                        <div class="h5 mt-2 mb-0">{{ parcelle.longueur|number_format(1) }} x {{ parcelle.largeur|number_format(1) }} m</div>
+                    </div>
+                </div>
+                {% if parcelle.plantNames is not empty %}
+                    <div class="plant-chip-grid">
+                        {% for name in parcelle.plantNames %}
+                            <article class="plant-chip">
+                                <span class="plant-chip-name">{{ name }}</span>
+                                <span class="plant-chip-type">Sur cette parcelle</span>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </article>
+        {% else %}
+            <article class="scene-step is-active">
+                <div class="section-kicker"><i class="bi bi-seedling"></i> Aucune plante</div>
+                <h2 class="h3 mt-3 mb-1">Ajoutez des plantes</h2>
+                <p class="muted mb-0">Les marqueurs apparaitront sur leurs parcelles respectives.</p>
+            </article>
+        {% endfor %}
+    </div>
+
+    <div class="scene-stash" aria-hidden="true">
+        {% for parcelle in sceneParcelles %}
+            <div
+                class="scene-parcelle-label parcel-label"
+                data-parcelle-id="{{ parcelle.id }}"
+                data-longueur="{{ parcelle.longueur }}"
+                data-largeur="{{ parcelle.largeur }}"
+                data-type-sol="{{ parcelle.typeDeSol }}"
+            >
+                <span class="label-kicker">Parcelle {{ parcelle.id }}</span>
+                <strong>{{ parcelle.proprietaire }}</strong>
+                <div class="muted mt-1">{{ parcelle.localisation }}</div>
+                <div class="badge-soft mt-3">{{ parcelle.superficie ? parcelle.superficie|number_format(2) : '0.00' }} m²</div>
+            </div>
+        {% endfor %}
+
+        {% for plante in scenePlantes %}
+            <div
+                class="scene-plant-marker plant-label"
+                data-plante-id="{{ plante.id }}"
+                data-plante-name="{{ plante.nom }}"
+                data-plante-type="{{ plante.type }}"
+                data-parcelle-id="{{ plante.parcelleId }}"
+            >
+                <span class="label-kicker">Plante {{ plante.id }}</span>
+                <strong>{{ plante.nom }}</strong>
+                <div class="muted mt-1">{{ plante.type }}</div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    <div class="row g-3">
+        <div class="col-md-6">
+            {{ form_label(form.proprietaire) }}
+            {{ form_widget(form.proprietaire, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.proprietaire) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_label(form.localisation) }}
+            {{ form_widget(form.localisation, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.localisation) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_label(form.longueur) }}
+            {{ form_widget(form.longueur, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.longueur) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_label(form.largeur) }}
+            {{ form_widget(form.largeur, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.largeur) }}
+        </div>
+        <div class="col-12">
+            {{ form_label(form.typeDeSol) }}
+            {{ form_widget(form.typeDeSol, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.typeDeSol) }}
+        </div>
+    </div>
+    <div class="action-row mt-4">
+        <button class="button-primary" type="submit">{{ button_label ?? 'Sauvegarder' }}</button>
+        <a href="{{ path('app_parcelle_index') }}" class="button-ghost">Annuler</a>
+    </div>
+{{ form_end(form) }}

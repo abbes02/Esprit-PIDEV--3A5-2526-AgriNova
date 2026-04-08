@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle parcelle{% endblock %}
+
+{% block body %}
+<section class="form-shell reveal">
+    <div class="section-head">
+        <div>
+            <div class="section-kicker"><i class="bi bi-plus-square"></i> Nouvelle parcelle</div>
+            <h1 class="page-title">Ajouter une nouvelle parcelle</h1>
+        </div>
+        <a href="{{ path('app_parcelle_index') }}" class="button-secondary">Retour a la liste</a>
+    </div>
+    {{ include('parcelle/_form.html.twig', {'form': form}) }}
+</section>
+{% endblock %}

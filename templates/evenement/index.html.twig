@@ -1,68 +1,61 @@
-{% extends 'base.html.twig' %}
-{% block title %}Événements{% endblock %}
-{% block breadcrumb %}Événements{% endblock %}
+{% extends 'parcelle/base.html.twig' %}
+
+{% block title %}Evenements{% endblock %}
 
 {% block body %}
-<div class="page-header">
-    <div class="page-header-left">
-        <div class="breadcrumb-label">Dashboard</div>
-        <h1>Événements <small>{{ evenements|length }} résultat(s)</small></h1>
+<section class="page-panel reveal">
+    <div class="section-head">
+        <div>
+            <div class="section-kicker"><i class="bi bi-calendar-week"></i> Agenda</div>
+            <h1 class="page-title reveal-text">Evenements</h1>
+            <p class="page-intro">{{ evenements|length }} resultat(s) disponibles.</p>
+        </div>
+        <div class="stack-sm">
+            <a href="{{ path('evenement_pdf', { q: q }) }}" class="button-secondary">Exporter PDF</a>
+            <a href="{{ path('evenement_new') }}" class="button-primary">Nouvel evenement</a>
+        </div>
     </div>
-    <div style="display:flex;gap:10px">
-        <a href="{{ path('evenement_pdf', {q: q}) }}" class="btn btn-green" id="pdf-btn">
-            📄 Exporter PDF
-        </a>
-        <a href="{{ path('evenement_new') }}" class="btn btn-green">
-            ➕ Nouvel événement
-        </a>
+
+    <form class="search-form mb-4" method="get">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-8">
+                <label for="evenement-search">Recherche</label>
+                <input
+                    id="evenement-search"
+                    class="form-control"
+                    type="search"
+                    name="q"
+                    value="{{ q }}"
+                    placeholder="Formation, lieu, type, statut"
+                >
+            </div>
+            <div class="col-md-4">
+                <button class="button-primary w-100" type="submit">Rechercher</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="table-shell">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Formation</th>
+                        <th>Lieu</th>
+                        <th>Type</th>
+                        <th>Debut</th>
+                        <th>Fin</th>
+                        <th>Capacite</th>
+                        <th>Inscrits</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    {% include 'evenement/_table.html.twig' %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
-
-<div class="search-wrap">
-    <span class="icon">🔍</span>
-    <input type="search" id="search-input" class="search-input"
-           placeholder="Rechercher par formation, lieu, type, statut…"
-           value="{{ q }}" autocomplete="off">
-</div>
-
-<div class="ag-table-wrap">
-    <table class="ag-table">
-        <thead>
-            <tr>
-                <th>Formation</th>
-                <th>Lieu</th>
-                <th>Type</th>
-                <th>Début</th>
-                <th>Fin</th>
-                <th>Capacité</th>
-                <th>Inscrits</th>
-                <th>Statut</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="table-body">
-            {% include 'evenement/_table.html.twig' %}
-        </tbody>
-    </table>
-</div>
-
-<script>
-(function () {
-    const input   = document.getElementById('search-input');
-    const tbody   = document.getElementById('table-body');
-    const pdfBtn  = document.getElementById('pdf-btn');
-    const baseUrl = '{{ path('evenement_index') }}';
-    const pdfBase = '{{ path('evenement_pdf') }}';
-    let timer;
-    input.addEventListener('input', function () {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-            const q = encodeURIComponent(this.value.trim());
-            pdfBtn.href = pdfBase + (q ? '?q=' + q : '');
-            fetch(baseUrl + '?q=' + q, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(r => r.text()).then(html => { tbody.innerHTML = html; });
-        }, 300);
-    });
-})();
-</script>
+</section>
 {% endblock %}

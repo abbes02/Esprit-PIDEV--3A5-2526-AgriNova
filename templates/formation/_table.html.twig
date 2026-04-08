@@ -1,31 +1,24 @@
-{% for f in formations %}
-<tr>
-    <td style="font-weight:600;color:#c8e8c8">{{ f.titre }}</td>
-    <td>{{ f.domaine }}</td>
-    <td>{{ f.niveau }}</td>
-    <td>{{ f.dureeHeures }} h</td>
-    <td style="color:#7ed87e;font-weight:600">{{ f.prix }} €</td>
-    <td>
-        {% if f.statut == 'actif' %}
-            <span class="badge badge-green">{{ f.statut }}</span>
-        {% elseif f.statut == 'inactif' %}
-            <span class="badge badge-red">{{ f.statut }}</span>
-        {% else %}
-            <span class="badge badge-gray">{{ f.statut }}</span>
-        {% endif %}
-    </td>
-    <td>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <a href="{{ path('formation_show', {id: f.id}) }}" class="btn btn-green btn-sm">👁 Voir</a>
-            <a href="{{ path('formation_edit', {id: f.id}) }}" class="btn btn-green btn-sm">✏️ Modifier</a>
-            <form method="post" action="{{ path('formation_delete', {id: f.id}) }}" style="display:inline"
-                  onsubmit="return confirm('Supprimer cette formation ?')">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ f.id) }}">
-                <button class="btn btn-green btn-sm">🗑 Supprimer</button>
-            </form>
-        </div>
-    </td>
-</tr>
+{% for formation in formations %}
+    <tr>
+        <td>{{ formation.titre }}</td>
+        <td>{{ formation.domaine }}</td>
+        <td>{{ formation.niveau }}</td>
+        <td>{{ formation.dureeHeures }} h</td>
+        <td>{{ formation.prix }}</td>
+        <td><span class="badge-soft">{{ formation.statut }}</span></td>
+        <td>
+            <div class="stack-sm">
+                <a href="{{ path('formation_show', { id: formation.id }) }}" class="button-secondary">Voir</a>
+                <a href="{{ path('formation_edit', { id: formation.id }) }}" class="button-primary">Modifier</a>
+                <form method="post" action="{{ path('formation_delete', { id: formation.id }) }}" onsubmit="return confirm('Supprimer cette formation ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ formation.id) }}">
+                    <button class="button-success" type="submit">Supprimer</button>
+                </form>
+            </div>
+        </td>
+    </tr>
 {% else %}
-<tr class="empty-row"><td colspan="7">Aucune formation trouvée.</td></tr>
+    <tr>
+        <td colspan="7" class="text-center muted py-4">Aucune formation trouvee.</td>
+    </tr>
 {% endfor %}

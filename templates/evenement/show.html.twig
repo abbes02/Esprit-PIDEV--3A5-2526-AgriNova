@@ -1,79 +1,49 @@
-{% extends 'base.html.twig' %}
-{% block title %}Événement — {{ evenement.lieu }}{% endblock %}
-{% block breadcrumb %}Événements › {{ evenement.lieu }}{% endblock %}
+{% extends 'parcelle/base.html.twig' %}
+
+{% block title %}{{ evenement.lieu }}{% endblock %}
 
 {% block body %}
-<div class="page-header">
-    <h1>📍 {{ evenement.lieu }}</h1>
-    <div style="display:flex;gap:10px">
-        <a href="{{ path('evenement_edit', {id: evenement.id}) }}" class="btn btn-amber">✏️ Modifier</a>
-        <a href="{{ path('evenement_index') }}" class="btn btn-outline">← Retour</a>
+<section class="page-panel reveal">
+    <div class="section-head">
+        <div>
+            <div class="section-kicker"><i class="bi bi-calendar-event"></i> Detail</div>
+            <h1 class="page-title reveal-text">{{ evenement.lieu }}</h1>
+        </div>
+        <div class="stack-sm">
+            <a href="{{ path('evenement_edit', { id: evenement.id }) }}" class="button-primary">Modifier</a>
+            <a href="{{ path('evenement_index') }}" class="button-secondary">Retour</a>
+        </div>
     </div>
-</div>
 
-<div class="detail-grid">
-    <div class="detail-cell full">
-        <div class="detail-label">Formation</div>
-        <div class="detail-value">
-            <a href="{{ path('formation_show', {id: evenement.formation.id}) }}"
-               style="color:#7ed87e;text-decoration:none;font-weight:600">
-                📚 {{ evenement.formation.titre }}
-            </a>
-        </div>
+    <div class="detail-grid">
+        <article class="info-card">
+            <div class="muted">Formation</div>
+            <strong>{{ evenement.formation.titre }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Type</div>
+            <strong>{{ evenement.type }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Statut</div>
+            <strong>{{ evenement.statut }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Date de debut</div>
+            <strong>{{ evenement.dateDebut|date('d/m/Y H:i') }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Date de fin</div>
+            <strong>{{ evenement.dateFin|date('d/m/Y H:i') }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Capacite max</div>
+            <strong>{{ evenement.capaciteMax }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Nombre inscrits</div>
+            <strong>{{ evenement.nombreInscrits }}</strong>
+        </article>
     </div>
-    <div class="detail-cell">
-        <div class="detail-label">Type</div>
-        <div class="detail-value">
-            {% if evenement.type == 'presentiel' %}
-                <span class="badge badge-green">{{ evenement.type }}</span>
-            {% elseif evenement.type == 'en_ligne' %}
-                <span class="badge badge-blue">{{ evenement.type }}</span>
-            {% else %}
-                <span class="badge badge-amber">{{ evenement.type }}</span>
-            {% endif %}
-        </div>
-    </div>
-    <div class="detail-cell">
-        <div class="detail-label">Statut</div>
-        <div class="detail-value">
-            {% if evenement.statut == 'planifie' %}
-                <span class="badge badge-blue">{{ evenement.statut }}</span>
-            {% elseif evenement.statut == 'en_cours' %}
-                <span class="badge badge-green">{{ evenement.statut }}</span>
-            {% elseif evenement.statut == 'termine' %}
-                <span class="badge badge-gray">{{ evenement.statut }}</span>
-            {% else %}
-                <span class="badge badge-red">{{ evenement.statut }}</span>
-            {% endif %}
-        </div>
-    </div>
-    <div class="detail-cell">
-        <div class="detail-label">Date de début</div>
-        <div class="detail-value">{{ evenement.dateDebut|date('d/m/Y H:i') }}</div>
-    </div>
-    <div class="detail-cell">
-        <div class="detail-label">Date de fin</div>
-        <div class="detail-value">{{ evenement.dateFin|date('d/m/Y H:i') }}</div>
-    </div>
-    <div class="detail-cell">
-        <div class="detail-label">Capacité max</div>
-        <div class="detail-value" style="font-size:1.2rem;font-weight:700;color:#7ed87e">
-            {{ evenement.capaciteMax }}
-        </div>
-    </div>
-    <div class="detail-cell">
-        <div class="detail-label">Inscrits</div>
-        <div class="detail-value">
-            <span style="font-size:1.2rem;font-weight:700;color:{% if evenement.nombreInscrits >= evenement.capaciteMax %}#e07070{% else %}#7ed87e{% endif %}">
-                {{ evenement.nombreInscrits }}
-            </span>
-            <span style="color:var(--text-dim)"> / {{ evenement.capaciteMax }}</span>
-            {# Progress bar #}
-            {% set pct = evenement.capaciteMax > 0 ? ((evenement.nombreInscrits / evenement.capaciteMax) * 100)|round : 0 %}
-            <div style="margin-top:8px;background:rgba(255,255,255,0.08);border-radius:4px;height:6px;overflow:hidden">
-                <div style="width:{{ pct }}%;height:100%;background:{% if pct >= 100 %}#c0392b{% elseif pct >= 75 %}#b8860b{% else %}#3a7a3a{% endif %};border-radius:4px;transition:width 0.4s"></div>
-            </div>
-        </div>
-    </div>
-</div>
+</section>
 {% endblock %}

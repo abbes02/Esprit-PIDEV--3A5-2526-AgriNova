@@ -1,32 +1,35 @@
-{% extends 'base.html.twig' %}
+{% extends 'parcelle/base.html.twig' %}
+
 {% block title %}{{ title }}{% endblock %}
-{% block breadcrumb %}Événements › {{ title }}{% endblock %}
 
 {% block body %}
-<div class="page-header">
-    <h1>{{ title }}</h1>
-    <a href="{{ path('evenement_index') }}" class="btn btn-outline">← Retour</a>
-</div>
-
-<div class="ag-card">
-    {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
-
-    <div class="form-grid cols-2">
-        <div class="col-span-2">{{ form_row(form.formation) }}</div>
-        <div>{{ form_row(form.dateDebut) }}</div>
-        <div>{{ form_row(form.dateFin) }}</div>
-        <div>{{ form_row(form.lieu) }}</div>
-        <div>{{ form_row(form.type) }}</div>
-        <div>{{ form_row(form.capaciteMax) }}</div>
-        <div>{{ form_row(form.nombreInscrits) }}</div>
-        <div>{{ form_row(form.statut) }}</div>
+<section class="page-panel reveal">
+    <div class="section-head">
+        <div>
+            <div class="section-kicker"><i class="bi bi-calendar-plus"></i> Evenement</div>
+            <h1 class="page-title reveal-text">{{ title }}</h1>
+        </div>
+        <a href="{{ path('evenement_index') }}" class="button-secondary">Retour</a>
     </div>
 
-    <div class="form-actions">
-        <button class="btn btn-green">💾 Enregistrer</button>
-        <a href="{{ path('evenement_index') }}" class="btn btn-outline">Annuler</a>
-    </div>
+    <div class="form-shell">
+        {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+        <div class="row g-3">
+            <div class="col-12">{{ form_row(form.formation) }}</div>
+            <div class="col-md-6">{{ form_row(form.dateDebut) }}</div>
+            <div class="col-md-6">{{ form_row(form.dateFin) }}</div>
+            <div class="col-md-6">{{ form_row(form.lieu) }}</div>
+            <div class="col-md-6">{{ form_row(form.type) }}</div>
+            <div class="col-md-4">{{ form_row(form.capaciteMax) }}</div>
+            <div class="col-md-4">{{ form_row(form.nombreInscrits) }}</div>
+            <div class="col-md-4">{{ form_row(form.statut) }}</div>
+        </div>
 
-    {{ form_end(form) }}
-</div>
+        <div class="stack-sm mt-4">
+            <button class="button-primary" type="submit">Enregistrer</button>
+            <a href="{{ path('evenement_index') }}" class="button-secondary">Annuler</a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</section>
 {% endblock %}

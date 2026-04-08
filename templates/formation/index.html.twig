@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+{% block title %}Formations{% endblock %}
+{% block breadcrumb %}Formations{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="page-header-left">
+        <div class="breadcrumb-label">Dashboard</div>
+        <h1>Formations <small>{{ formations|length }} résultat(s)</small></h1>
+    </div>
+    <div style="display:flex;gap:10px">
+        <a href="{{ path('formation_pdf', {q: q}) }}" class="btn btn-green" id="pdf-btn">
+            📄 Exporter PDF
+        </a>
+        <a href="{{ path('formation_new') }}" class="btn btn-green">
+            ➕ Nouvelle formation
+        </a>
+    </div>
+</div>
+
+<div class="search-wrap">
+    <span class="icon">🔍</span>
+    <input type="search" id="search-input" class="search-input"
+           placeholder="Rechercher par titre, domaine, niveau, statut…"
+           value="{{ q }}" autocomplete="off">
+</div>
+
+<div class="ag-table-wrap">
+    <table class="ag-table">
+        <thead>
+            <tr>
+                <th>Titre</th>
+                <th>Domaine</th>
+                <th>Niveau</th>
+                <th>Durée</th>
+                <th>Prix</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            {% include 'formation/_table.html.twig' %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+(function () {
+    const input   = document.getElementById('search-input');
+    const tbody   = document.getElementById('table-body');
+    const pdfBtn  = document.getElementById('pdf-btn');
+    const baseUrl = '{{ path('formation_index') }}';
+    const pdfBase = '{{ path('formation_pdf') }}';
+    let timer;
+    input.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            const q = encodeURIComponent(this.value.trim());
+            pdfBtn.href = pdfBase + (q ? '?q=' + q : '');
+            fetch(baseUrl + '?q=' + q, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.text()).then(html => { tbody.innerHTML = html; });
+        }, 300);
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,366 @@
+:root {
+    --bg-1: #eef6ea;
+    --bg-2: #f8efe2;
+    --panel: rgba(255, 252, 246, 0.88);
+    --text: #17301f;
+    --muted: #5b685d;
+    --line: rgba(23, 48, 31, 0.12);
+    --primary: #2f7a45;
+    --primary-dark: #215934;
+    --shadow: 0 30px 80px rgba(28, 56, 35, 0.14);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Outfit', sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(circle at top left, rgba(94, 170, 108, 0.22), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(229, 179, 89, 0.18), transparent 24%),
+        linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+}
+
+.login-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+.login-panel {
+    width: min(100%, 460px);
+    padding: 36px;
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background: var(--panel);
+    backdrop-filter: blur(14px);
+    box-shadow: var(--shadow);
+}
+
+.eyebrow {
+    margin: 0 0 10px;
+    color: var(--primary-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.brand-block h1 {
+    margin: 0;
+    font-size: clamp(2.4rem, 7vw, 3.4rem);
+    line-height: 1;
+}
+
+.intro {
+    margin: 14px 0 0;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.login-form {
+    display: grid;
+    gap: 14px;
+    margin-top: 28px;
+}
+
+.alert {
+    margin: 20px 0 0;
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-size: 0.95rem;
+}
+
+.alert-error {
+    color: #7c1f1f;
+    background: rgba(196, 65, 65, 0.12);
+    border: 1px solid rgba(196, 65, 65, 0.18);
+}
+
+.alert-success {
+    color: #1f5b32;
+    background: rgba(47, 122, 69, 0.12);
+    border: 1px solid rgba(47, 122, 69, 0.18);
+}
+
+.login-form label {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.login-form input {
+    width: 100%;
+    min-height: 50px;
+    padding: 0 15px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.88);
+    color: var(--text);
+    font: inherit;
+}
+
+.login-form input:focus {
+    outline: 2px solid rgba(47, 122, 69, 0.18);
+    border-color: rgba(47, 122, 69, 0.45);
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-weight: 400;
+}
+
+.checkbox input {
+    min-height: auto;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+
+.link {
+    color: var(--primary-dark);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.helper-inline,
+.helper-text {
+    color: var(--muted);
+}
+
+button {
+    width: 100%;
+    min-height: 52px;
+    margin-top: 4px;
+    border: 0;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--primary) 0%, #5d9e48 100%);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 12px 28px rgba(47, 122, 69, 0.24);
+}
+
+.dashboard-panel {
+    width: min(100%, 560px);
+}
+
+.register-panel {
+    width: min(100%, 620px);
+}
+
+.admin-panel {
+    width: min(100%, 1180px);
+}
+
+.double-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.dashboard-card {
+    margin-top: 28px;
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.62);
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.dashboard-meta {
+    margin: 0 0 18px;
+}
+
+.helper-text {
+    margin: 18px 0 0;
+    text-align: center;
+}
+
+.admin-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.admin-toolbar-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.admin-logout-button {
+    width: auto;
+    min-height: 46px;
+    margin-top: 0;
+    padding: 0 18px;
+    box-shadow: none;
+}
+
+.admin-filters {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) minmax(180px, 220px) auto;
+    gap: 14px;
+    margin-top: 18px;
+    align-items: end;
+}
+
+.admin-filter-field {
+    display: grid;
+    gap: 8px;
+}
+
+.admin-filter-field label {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.admin-filter-field input,
+.admin-filter-field select {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.88);
+    color: var(--text);
+    font: inherit;
+}
+
+.admin-filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-filter-actions button {
+    width: auto;
+    min-height: 48px;
+    margin-top: 0;
+    padding: 0 18px;
+    box-shadow: none;
+}
+
+.admin-table-wrapper {
+    margin-top: 22px;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.62);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 920px;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+}
+
+.admin-table th {
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--primary-dark);
+}
+
+.admin-inline-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.login-form select,
+.admin-inline-form select {
+    min-height: 46px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.88);
+    color: var(--text);
+    font: inherit;
+}
+
+.admin-inline-form button {
+    width: auto;
+    min-height: 46px;
+    margin-top: 0;
+    padding: 0 16px;
+    border-radius: 14px;
+    box-shadow: none;
+}
+
+.button-danger {
+    background: linear-gradient(135deg, #9d3b33 0%, #c25645 100%);
+}
+
+.role-chip {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 10px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(47, 122, 69, 0.12);
+    color: var(--primary-dark);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+button:hover {
+    filter: brightness(1.03);
+}
+
+@media (max-width: 520px) {
+    .login-panel {
+        padding: 26px 20px;
+    }
+
+    .double-grid,
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-toolbar,
+    .admin-toolbar-meta,
+    .admin-inline-form,
+    .admin-filter-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-filters {
+        grid-template-columns: 1fr;
+    }
+}

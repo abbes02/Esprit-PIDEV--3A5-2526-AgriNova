@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Creation de compte | AgriNova{% endblock %}
+{% block meta_description %}Creer un compte AgriNova.{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="/styles/agriculteur.css">
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/libs/gsap/gsap.min.js"></script>
+    <script src="/libs/gsap/ScrollTrigger.min.js"></script>
+    <script type="module" src="/scripts/agriculteur-scene.js"></script>
+{% endblock %}
+
+{% block body %}
+    <canvas id="bg" aria-hidden="true"></canvas>
+
+    <main class="agri-page">
+        <section class="auth-shell ui">
+            <aside class="auth-box glass parallax" data-speed="0.12">
+                <div>
+                    <p class="eyebrow">AgriNova</p>
+                    <h1 class="reveal-text">Creation de compte</h1>
+                    <p class="hero-text">
+                        Creez votre compte depuis un formulaire unique, sans barre de navigation.
+                    </p>
+                </div>
+
+                {% if error_message %}
+                    <p class="alert alert-error">{{ error_message }}</p>
+                {% endif %}
+
+                <form class="auth-stack" method="post" action="/register">
+                    <div class="auth-row">
+                        <label for="nom">
+                            Nom
+                            <input id="nom" name="nom" type="text" value="{{ values.nom }}" required>
+                        </label>
+
+                        <label for="prenom">
+                            Prenom
+                            <input id="prenom" name="prenom" type="text" value="{{ values.prenom }}" required>
+                        </label>
+                    </div>
+
+                    <label for="email">
+                        Email
+                        <input id="email" name="email" type="email" value="{{ values.email }}" required>
+                    </label>
+
+                    <div class="auth-row">
+                        <label for="telephone">
+                            Telephone
+                            <input id="telephone" name="telephone" type="text" value="{{ values.telephone }}" placeholder="21612345678">
+                        </label>
+
+                        <label for="role">
+                            Role
+                            <select id="role" name="role" required>
+                                {% for role in allowed_roles %}
+                                    <option value="{{ role }}" {% if values.role == role %}selected{% endif %}>{{ role }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+
+                    <label for="adresse">
+                        Adresse
+                        <input id="adresse" name="adresse" type="text" value="{{ values.adresse }}" required>
+                    </label>
+
+                    <div class="auth-row">
+                        <label for="password">
+                            Mot de passe
+                            <input id="password" name="password" type="password" minlength="6" required>
+                        </label>
+
+                        <label for="password_confirmation">
+                            Confirmation
+                            <input id="password_confirmation" name="password_confirmation" type="password" minlength="6" required>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="primary-action">Creer mon compte</button>
+                </form>
+
+                <p class="helper-text">
+                    Vous avez deja un compte ?
+                    <a class="link" href="/login">Se connecter</a>
+                </p>
+            </aside>
+        </section>
+    </main>
+{% endblock %}

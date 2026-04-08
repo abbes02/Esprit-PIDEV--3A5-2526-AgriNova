@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Interface livreur | AgriNova{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="/styles/agriculteur.css">
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/libs/gsap/gsap.min.js"></script>
+    <script src="/libs/gsap/ScrollTrigger.min.js"></script>
+    <script type="module" src="/scripts/agriculteur-scene.js"></script>
+{% endblock %}
+
+{% block body %}
+    <canvas id="bg" aria-hidden="true"></canvas>
+
+    <main class="agri-page">
+        <section class="welcome-shell ui">
+            <div class="welcome-box glass parallax" data-speed="0.12">
+                <p class="eyebrow">AgriNova</p>
+                <h1 class="reveal-text">Bienvenue mr le {{ role }}</h1>
+                <p class="hero-text">{{ user_display_name }}</p>
+                <form method="post" action="/logout" class="logout-form">
+                    <button type="submit" class="primary-action">Se deconnecter</button>
+                </form>
+            </div>
+        </section>
+    </main>
+{% endblock %}

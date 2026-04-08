@@ -1,0 +1,52 @@
+<header class="topbar glass parallax" data-speed="0.12">
+    <div>
+        <p class="eyebrow">AgriNova</p>
+        <h1 class="reveal-text">{{ title }}</h1>
+    </div>
+
+    <div class="topbar-right">
+        <label class="sr-only" for="weather">Weather</label>
+        <select id="weather" class="glass-select">
+            <option>Ensoleille</option>
+            <option>Nuageux</option>
+            <option>Pluvieux</option>
+            <option>Neigeux</option>
+        </select>
+
+        <label class="sr-only" for="timeOfDay">Time of day</label>
+        <select id="timeOfDay" class="glass-select">
+            <option>Matin</option>
+            <option>Coucher de soleil</option>
+            <option>Nuit</option>
+        </select>
+
+        <label class="sr-only" for="lang">Language</label>
+        <select id="lang" class="glass-select">
+            <option>Francais</option>
+            <option>English</option>
+            <option>Arabic</option>
+        </select>
+
+        <label class="sr-only" for="currency">Currency</label>
+        <select id="currency" class="glass-select">
+            <option>DT</option>
+            <option>USD</option>
+            <option>EUR</option>
+            <option>GBP</option>
+            <option>JPY</option>
+        </select>
+
+        <button class="glass-btn" type="button">ChatBot</button>
+
+        <div class="user-chip">
+            <div class="user-avatar">
+                <img src="/logo.png" alt="User avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+                <span class="user-avatar-fallback">{{ user_name|slice(0, 1)|upper }}</span>
+            </div>
+            <div class="user-meta">
+                <span class="user-name">{{ user_name }}</span>
+                <span class="user-email">{{ user_email }}</span>
+            </div>
+        </div>
+    </div>
+</header>

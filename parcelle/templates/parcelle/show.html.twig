@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parcelle }}{% endblock %}
+
+{% block body %}
+<section class="page-panel reveal">
+    <div class="section-head">
+        <div>
+            <div class="section-kicker"><i class="bi bi-geo-fill"></i> Parcelle {{ parcelle.idParcelle }}</div>
+            <h1 class="page-title">{{ parcelle.proprietaire }}</h1>
+            <p class="page-intro">Fiche detaillee de la parcelle avec ses dimensions, sa localisation et son type de sol.</p>
+        </div>
+        <div class="action-row">
+            <a href="{{ path('app_parcelle_edit', {'idParcelle': parcelle.idParcelle}) }}" class="button-primary">Modifier</a>
+            <a href="{{ path('app_parcelle_index') }}" class="button-secondary">Retour</a>
+        </div>
+    </div>
+
+    <div class="detail-grid mb-4">
+        <div class="detail-item"><div class="section-kicker">ID</div><h3 class="h4 mt-2">{{ parcelle.idParcelle }}</h3></div>
+        <div class="detail-item"><div class="section-kicker">Localisation</div><h3 class="h4 mt-2">{{ parcelle.localisation }}</h3></div>
+        <div class="detail-item"><div class="section-kicker">Longueur</div><h3 class="h4 mt-2">{{ parcelle.longueur|number_format(2) }} m</h3></div>
+        <div class="detail-item"><div class="section-kicker">Largeur</div><h3 class="h4 mt-2">{{ parcelle.largeur|number_format(2) }} m</h3></div>
+        <div class="detail-item"><div class="section-kicker">Superficie</div><h3 class="h4 mt-2">{{ parcelle.superficie ? parcelle.superficie|number_format(2) : 'N/A' }} m²</h3></div>
+        <div class="detail-item"><div class="section-kicker">Sol</div><h3 class="h4 mt-2">{{ parcelle.typeDeSol }}</h3></div>
+    </div>
+
+    {{ include('parcelle/_delete_form.html.twig', {'parcelle': parcelle}) }}
+</section>
+{% endblock %}

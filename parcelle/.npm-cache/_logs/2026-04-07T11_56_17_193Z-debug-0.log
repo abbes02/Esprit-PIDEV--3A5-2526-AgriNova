@@ -1,0 +1,74 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.8.0
+2 info using node@v24.13.1
+3 silly config load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\IBRI\Desktop\Web2.0\parcelle\.npmrc
+5 silly config load:file:C:\Users\IBRI\.npmrc
+6 silly config load:file:C:\Users\IBRI\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install three gsap esbuild
+8 verbose argv "install" "three" "gsap" "esbuild"
+9 verbose logfile logs-max:10 dir:C:\Users\IBRI\Desktop\Web2.0\parcelle\.npm-cache\_logs\2026-04-07T11_56_17_193Z-
+10 verbose logfile C:\Users\IBRI\Desktop\Web2.0\parcelle\.npm-cache\_logs\2026-04-07T11_56_17_193Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:2348810240 maxSize:587202560 maxEntrySize:293601280
+13 http fetch GET https://registry.npmjs.org/npm attempt 1 failed with EACCES
+14 silly idealTree buildDeps
+15 silly fetch manifest three@*
+16 silly packumentCache full:https://registry.npmjs.org/three cache-miss
+17 http fetch GET https://registry.npmjs.org/three attempt 1 failed with EACCES
+18 http fetch GET https://registry.npmjs.org/npm attempt 2 failed with EACCES
+19 http fetch GET https://registry.npmjs.org/three attempt 2 failed with EACCES
+20 http fetch GET https://registry.npmjs.org/npm attempt 3 failed with EACCES
+21 http fetch GET https://registry.npmjs.org/three attempt 3 failed with EACCES
+22 silly fetch manifest gsap@*
+23 silly packumentCache full:https://registry.npmjs.org/gsap cache-miss
+24 http fetch GET https://registry.npmjs.org/gsap attempt 1 failed with EACCES
+25 http fetch GET https://registry.npmjs.org/gsap attempt 2 failed with EACCES
+26 http fetch GET https://registry.npmjs.org/gsap attempt 3 failed with EACCES
+27 silly fetch manifest esbuild@*
+28 silly packumentCache full:https://registry.npmjs.org/esbuild cache-miss
+29 http fetch GET https://registry.npmjs.org/esbuild attempt 1 failed with EACCES
+30 http fetch GET https://registry.npmjs.org/esbuild attempt 2 failed with EACCES
+31 http fetch GET https://registry.npmjs.org/esbuild attempt 3 failed with EACCES
+32 silly placeDep ROOT esbuild@ OK for: parcelle@1.0.0 want: *
+33 silly placeDep ROOT gsap@ OK for: parcelle@1.0.0 want: *
+34 silly placeDep ROOT three@ OK for: parcelle@1.0.0 want: *
+35 verbose type system
+36 verbose stack FetchError: request to https://registry.npmjs.org/esbuild failed, reason: 
+36 verbose stack     at ClientRequest.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\minipass-fetch\lib\index.js:130:14)
+36 verbose stack     at ClientRequest.emit (node:events:508:28)
+36 verbose stack     at emitErrorEvent (node:_http_client:108:11)
+36 verbose stack     at _destroy (node:_http_client:963:9)
+36 verbose stack     at onSocketNT (node:_http_client:983:5)
+36 verbose stack     at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+37 error code EACCES
+38 error errno EACCES
+39 error FetchError: request to https://registry.npmjs.org/esbuild failed, reason: 
+39 error     at ClientRequest.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\minipass-fetch\lib\index.js:130:14)
+39 error     at ClientRequest.emit (node:events:508:28)
+39 error     at emitErrorEvent (node:_http_client:108:11)
+39 error     at _destroy (node:_http_client:963:9)
+39 error     at onSocketNT (node:_http_client:983:5)
+39 error     at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+39 error   code: 'EACCES',
+39 error   errno: 'EACCES',
+39 error   type: 'system',
+39 error   requiredBy: '.'
+39 error }
+40 error
+40 error The operation was rejected by your operating system.
+40 error It's possible that the file was already in use (by a text editor or antivirus),
+40 error or that you lack permissions to access it.
+40 error
+40 error If you believe this might be a permissions issue, please double-check the
+40 error permissions of the file and its containing directories, or try running
+40 error the command again as root/Administrator.
+41 silly unfinished npm timer reify 1775562977646
+42 silly unfinished npm timer reify:loadTrees 1775562977649
+43 verbose cwd C:\Users\IBRI\Desktop\Web2.0\parcelle
+44 verbose os Windows_NT 10.0.19045
+45 verbose node v24.13.1
+46 verbose npm  v11.8.0
+47 verbose exit 1
+48 verbose code 1
+49 error A complete log of this run can be found in: C:\Users\IBRI\Desktop\Web2.0\parcelle\.npm-cache\_logs\2026-04-07T11_56_17_193Z-debug-0.log

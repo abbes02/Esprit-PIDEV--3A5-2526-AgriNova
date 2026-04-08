@@ -1,0 +1,11 @@
+# knp_snappy:
+#     pdf:
+#         enabled: true
+#         binary: '"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltopdf.exe"'  # Adjust path after install
+#         options: []
+#     image:
+#         enabled: true
+#         binary:  '"C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltoimage.exe"' # Adjust path after install
+#         options: []
+# Uncomment after composer require knp/snappy
+

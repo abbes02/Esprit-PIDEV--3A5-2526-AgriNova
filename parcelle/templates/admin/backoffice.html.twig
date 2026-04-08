@@ -1,0 +1,185 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Backoffice{% endblock %}
+
+{% block body %}
+<section class="page-panel reveal">
+    <div class="section-head">
+        <div>
+            <div class="section-kicker"><i class="bi bi-speedometer2"></i> Admin dashboard</div>
+            <h1 class="page-title">Backoffice</h1>
+            <p class="page-intro">Vue centrale pour administrer les parcelles et les plantes sans changer votre logique metier.</p>
+        </div>
+        <a href="{{ path('app_homepage') }}" class="button-secondary">Accueil</a>
+    </div>
+
+    <section class="page-panel mb-4">
+        <div class="section-head">
+            <div>
+                <div class="section-kicker"><i class="bi bi-sliders"></i> Recherche, tri et statistiques</div>
+                <h2 class="h3 mt-3 mb-1">Pilotage global</h2>
+                <p class="muted mb-0">Filtrez une entite a la fois et gardez les chiffres clefs visibles au-dessus des tables.</p>
+            </div>
+        </div>
+        <form method="get" class="search-form">
+            <div class="content-grid align-items-end">
+                <div class="span-3">
+                    <label for="entity">Section</label>
+                    <select id="entity" name="entity" class="form-select">
+                        <option value="parcelles" {{ entity == 'parcelles' ? 'selected' : '' }}>Parcelles</option>
+                        <option value="plantes" {{ entity == 'plantes' ? 'selected' : '' }}>Plantes</option>
+                    </select>
+                </div>
+                <div class="span-4">
+                    <label for="search">Recherche</label>
+                    <input id="search" name="search" type="text" class="form-control" value="{{ search }}" placeholder="Nom, proprietaire, localisation, type..." />
+                </div>
+                <div class="span-3">
+                    <label for="direction">Ordre</label>
+                    <select id="direction" name="direction" class="form-select">
+                        <option value="ASC" {{ direction == 'ASC' ? 'selected' : '' }}>Croissant</option>
+                        <option value="DESC" {{ direction == 'DESC' ? 'selected' : '' }}>Decroissant</option>
+                    </select>
+                </div>
+                <div class="span-2">
+                    <div class="stack-sm">
+                        <button type="submit" class="button-primary w-100"><i class="bi bi-search"></i> Filtrer</button>
+                    </div>
+                </div>
+            </div>
+            <div class="content-grid align-items-end mt-3">
+                <div class="span-6">
+                    <label for="parcelle_sort">Tri parcelles</label>
+                    <select id="parcelle_sort" name="parcelle_sort" class="form-select">
+                        <option value="idParcelle" {{ parcelle_sort == 'idParcelle' ? 'selected' : '' }}>ID</option>
+                        <option value="proprietaire" {{ parcelle_sort == 'proprietaire' ? 'selected' : '' }}>Proprietaire</option>
+                        <option value="localisation" {{ parcelle_sort == 'localisation' ? 'selected' : '' }}>Localisation</option>
+                        <option value="longueur" {{ parcelle_sort == 'longueur' ? 'selected' : '' }}>Longueur</option>
+                        <option value="largeur" {{ parcelle_sort == 'largeur' ? 'selected' : '' }}>Largeur</option>
+                        <option value="typeDeSol" {{ parcelle_sort == 'typeDeSol' ? 'selected' : '' }}>Type de sol</option>
+                    </select>
+                </div>
+                <div class="span-6">
+                    <label for="plante_sort">Tri plantes</label>
+                    <select id="plante_sort" name="plante_sort" class="form-select">
+                        <option value="idPlante" {{ plante_sort == 'idPlante' ? 'selected' : '' }}>ID</option>
+                        <option value="nom" {{ plante_sort == 'nom' ? 'selected' : '' }}>Nom</option>
+                        <option value="type" {{ plante_sort == 'type' ? 'selected' : '' }}>Type</option>
+                        <option value="quantite" {{ plante_sort == 'quantite' ? 'selected' : '' }}>Quantite</option>
+                        <option value="surface" {{ plante_sort == 'surface' ? 'selected' : '' }}>Surface</option>
+                        <option value="parcelle" {{ plante_sort == 'parcelle' ? 'selected' : '' }}>Parcelle</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+        <div class="metric-grid mt-4">
+            <article class="data-card">
+                <div class="metric-label">Parcelles</div>
+                <div class="metric-value">{{ parcelleStats.total }}</div>
+                <div class="muted">{{ parcelleStats.totalSurface|number_format(2) }} m² au total</div>
+            </article>
+            <article class="data-card">
+                <div class="metric-label">Moyenne parcelles</div>
+                <div class="metric-value">{{ parcelleStats.avgSurface|number_format(2) }}</div>
+                <div class="muted">m² par parcelle</div>
+            </article>
+            <article class="data-card">
+                <div class="metric-label">Plantes</div>
+                <div class="metric-value">{{ planteStats.total }}</div>
+                <div class="muted">{{ planteStats.totalSurface|number_format(2) }} m² au total</div>
+            </article>
+            <article class="data-card">
+                <div class="metric-label">Moyenne plantes</div>
+                <div class="metric-value">{{ planteStats.avgSurface|number_format(2) }}</div>
+                <div class="muted">m² par plante</div>
+            </article>
+        </div>
+    </section>
+
+    <div class="content-grid">
+        <div class="span-6">
+            <article class="info-card">
+                <div class="section-head">
+                    <div>
+                        <div class="section-kicker"><i class="bi bi-grid"></i> Gestion des parcelles</div>
+                        <h2 class="h3 mb-0">Parcelles</h2>
+                    </div>
+                    <a href="{{ path('app_parcelle_new') }}" class="button-primary">Ajouter</a>
+                </div>
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Proprietaire</th>
+                            <th>Localisation</th>
+                            <th>Superficie</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for parcelle in parcelles %}
+                            <tr>
+                                <td>{{ parcelle.idParcelle }}</td>
+                                <td>{{ parcelle.proprietaire }}</td>
+                                <td>{{ parcelle.localisation }}</td>
+                                <td><span class="badge-soft">{{ parcelle.superficie ? parcelle.superficie|number_format(2) : 'N/A' }} m²</span></td>
+                                <td>
+                                    <div class="action-row">
+                                        <a href="{{ path('app_parcelle_edit', {'idParcelle': parcelle.idParcelle}) }}" class="button-secondary">Modifier</a>
+                                        {{ include('parcelle/_delete_form.html.twig', {'parcelle': parcelle, 'button_class': 'button-secondary'}) }}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="5" class="muted">Aucune parcelle.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </article>
+        </div>
+
+        <div class="span-6">
+            <article class="info-card">
+                <div class="section-head">
+                    <div>
+                        <div class="section-kicker"><i class="bi bi-flower1"></i> Gestion des plantes</div>
+                        <h2 class="h3 mb-0">Plantes</h2>
+                    </div>
+                    <a href="{{ path('app_plante_new') }}" class="button-primary">Ajouter</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom</th>
+                                <th>Type</th>
+                                <th>Surface</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for plante in plantes %}
+                                <tr>
+                                    <td>{{ plante.idPlante }}</td>
+                                    <td>{{ plante.nom }}</td>
+                                    <td>{{ plante.type }}</td>
+                                    <td><span class="badge-soft">{{ plante.surface|number_format(2) }} m²</span></td>
+                                    <td>
+                                        <div class="action-row">
+                                            <a href="{{ path('app_plante_edit', {'idPlante': plante.idPlante}) }}" class="button-secondary">Modifier</a>
+                                            {{ include('plante/_delete_form.html.twig', {'plante': plante, 'button_class': 'button-secondary'}) }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="5" class="muted">Aucune plante.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+{% endblock %}

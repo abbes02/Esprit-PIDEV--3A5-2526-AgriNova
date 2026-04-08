@@ -1,0 +1,151 @@
+{% extends 'parcelle/base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block page_id %}homepage{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .homepage-ui {
+            min-height: 300vh;
+            padding-bottom: 30vh;
+        }
+
+        .homepage-ui .hero-panel,
+        .homepage-ui .info-card,
+        .homepage-ui .data-card {
+            background: rgba(8, 20, 13, 0.46);
+        }
+
+        .homepage-ui .hero-panel {
+            margin-top: 6vh;
+        }
+
+        .deep-section {
+            padding-top: 22vh;
+        }
+
+        .deep-copy {
+            max-width: 48rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="homepage-ui ui">
+    <section class="hero-panel reveal">
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <div class="hero-kicker"><i class="bi bi-tree"></i> Three.js field interface</div>
+                <h1 class="display-title reveal-text">Pilotez vos parcelles en profondeur.</h1>
+                <p class="lead-copy">
+                    Cette page charge maintenant les bibliotheques du template et applique un deplacement sur l'axe Z pendant le scroll pour donner une sensation de traversee du terrain.
+                </p>
+
+                <div class="button-row">
+                    <a class="button-primary" href="{{ path('app_parcelle_index') }}"><i class="bi bi-grid-1x2-fill"></i> Gerer les parcelles</a>
+                    <a class="button-secondary" href="{{ path('app_plante_index') }}"><i class="bi bi-flower2"></i> Gerer les plantes</a>
+                    <a class="button-ghost" href="{{ path('app_backoffice') }}"><i class="bi bi-speedometer2"></i> Ouvrir le backoffice</a>
+                </div>
+
+                <div class="metric-grid">
+                    <article class="data-card space-card">
+                        <div class="metric-value">{{ parcelleStats.total }}</div>
+                        <div class="metric-label">Parcelles suivies</div>
+                    </article>
+                    <article class="data-card space-card">
+                        <div class="metric-value">{{ parcelleStats.totalSurface|number_format(0, '.', ' ') }}</div>
+                        <div class="metric-label">m² de surface totale</div>
+                    </article>
+                    <article class="data-card space-card">
+                        <div class="metric-value">{{ planteStats.total }}</div>
+                        <div class="metric-label">Plantes referencees</div>
+                    </article>
+                    <article class="data-card space-card">
+                        <div class="metric-value">{{ planteStats.types|length }}</div>
+                        <div class="metric-label">Cultures distinctes</div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-block info deep-section">
+        <div class="content-grid">
+            <div class="span-7">
+                <article class="info-card reveal">
+                    <div class="section-head">
+                        <div class="deep-copy">
+                            <div class="section-kicker"><i class="bi bi-diagram-3"></i> Parcelles recentes</div>
+                            <h2 class="page-title reveal-text">Resume du terrain</h2>
+                            <p class="page-intro">Les donnees actuelles restent les memes. Le changement porte sur la scene, la profondeur de scroll et l'habillage.</p>
+                        </div>
+                        <a class="button-ghost" href="{{ path('app_parcelle_new') }}">Ajouter</a>
+                    </div>
+
+                    <div class="listing-grid">
+                        {% for parcelle in featuredParcelles %}
+                            <article class="data-card space-card">
+                                <div class="section-kicker"><i class="bi bi-pin-map"></i> {{ parcelle.localisation }}</div>
+                                <h3 class="h5 mt-2">{{ parcelle.proprietaire }}</h3>
+                                <p class="muted mb-3">Type de sol: {{ parcelle.typeDeSol }}</p>
+                                <div class="stack-sm">
+                                    <span class="badge-soft">{{ parcelle.longueur|number_format(1) }} m</span>
+                                    <span class="badge-soft">{{ parcelle.largeur|number_format(1) }} m</span>
+                                    <span class="badge-soft">{{ parcelle.superficie ? parcelle.superficie|number_format(1) : '0.0' }} m²</span>
+                                </div>
+                            </article>
+                        {% else %}
+                            <p class="muted mb-0">Aucune parcelle disponible.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+            </div>
+
+            <div class="span-5">
+                <article class="info-card reveal">
+                    <div class="section-head">
+                        <div>
+                            <div class="section-kicker"><i class="bi bi-flower1"></i> Cultures recentes</div>
+                            <h2 class="h3 mb-0 reveal-text">Plantes suivies</h2>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-3">
+                        {% for plante in featuredPlantes %}
+                            <article class="data-card space-card d-flex align-items-center justify-content-between gap-3">
+                                <div>
+                                    <div class="section-kicker"><i class="bi bi-droplet-half"></i> {{ plante.type }}</div>
+                                    <h3 class="h5 mt-2 mb-1">{{ plante.nom }}</h3>
+                                    <div class="muted">{{ plante.parcelle ? plante.parcelle.localisation : 'Sans parcelle' }}</div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="badge-soft mb-2">{{ plante.quantite }} unites</div>
+                                    <div class="muted">{{ plante.surface|number_format(2) }} m²</div>
+                                </div>
+                            </article>
+                        {% else %}
+                            <p class="muted mb-0">Aucune plante disponible.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <div class="scene-stash" aria-hidden="true">
+        {% for parcelle in featuredParcelles %}
+            <div class="parcel-label parcel-card" data-parcel-index="{{ loop.index0 }}">
+                <span class="label-kicker">Parcelle {{ parcelle.idParcelle }}</span>
+                <strong>{{ parcelle.proprietaire }}</strong>
+                <div class="muted mt-1">{{ parcelle.localisation }}</div>
+                <div class="badge-soft mt-3">{{ parcelle.superficie ? parcelle.superficie|number_format(2) : '0.00' }} m²</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+{% endblock %}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>agrinova</title>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; }
+        body { font-family: Arial; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 5px; }
+        th { background: #eee; }
+        h1 { text-align: center; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>agrinova</h1>
+    <p style="text-align: center; font-size: 14px; margin-bottom: 20px;">Date: {{ "now"|date("d/m/Y") }}</p>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Propriétaire</th>
+            <th>Localisation</th>
+            <th>Longueur</th>
+            <th>Largeur</th>
+            <th>Superficie</th>
+            <th>Type de sol</th>
+        </tr>
+        {% for parcelle in parcelles %}
+        <tr>
+            <td>{{ parcelle.idParcelle }}</td>
+            <td>{{ parcelle.proprietaire }}</td>
+            <td>{{ parcelle.localisation }}</td>
+            <td>{{ parcelle.longueur }}</td>
+            <td>{{ parcelle.largeur }}</td>
+            <td>{{ parcelle.superficie }}</td>
+            <td>{{ parcelle.typeDeSol }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

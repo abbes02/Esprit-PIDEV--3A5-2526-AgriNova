@@ -1,0 +1,41 @@
+{% extends 'parcelle/base.html.twig' %}
+
+{% block title %}{{ plante }}{% endblock %}
+
+{% block body %}
+<section class="page-panel reveal">
+    <div class="section-head">
+        <div>
+            <div class="section-kicker"><i class="bi bi-flower3"></i> Plante {{ plante.idPlante }}</div>
+            <h1 class="page-title">{{ plante.nom }}</h1>
+            <p class="page-intro">Fiche detaillee de la plante, de sa parcelle associee et de sa surface cultivee.</p>
+        </div>
+        <div class="action-row">
+            <a href="{{ path('app_plante_edit', {'idPlante': plante.idPlante}) }}" class="button-primary">Modifier</a>
+            <a href="{{ path('app_plante_index') }}" class="button-secondary">Retour</a>
+        </div>
+    </div>
+
+    <div class="content-grid mb-4">
+        <div class="span-7">
+            <div class="detail-grid">
+                <div class="detail-item"><div class="section-kicker">Type</div><h3 class="h4 mt-2">{{ plante.type }}</h3></div>
+                <div class="detail-item"><div class="section-kicker">Parcelle</div><h3 class="h4 mt-2">{{ plante.parcelle ? plante.parcelle : 'N/A' }}</h3></div>
+                <div class="detail-item"><div class="section-kicker">Quantite</div><h3 class="h4 mt-2">{{ plante.quantite }}</h3></div>
+                <div class="detail-item"><div class="section-kicker">Surface</div><h3 class="h4 mt-2">{{ plante.surface|number_format(2) }} m²</h3></div>
+            </div>
+        </div>
+        <div class="span-5">
+            <div class="detail-item h-100 d-flex align-items-center justify-content-center">
+                {% if plante.image %}
+                    <img src="{{ plante.image }}" alt="{{ plante.nom }}" class="img-fluid rounded-4">
+                {% else %}
+                    <div class="muted">Aucune image</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {{ include('plante/_delete_form.html.twig', {'plante': plante}) }}
+</section>
+{% endblock %}

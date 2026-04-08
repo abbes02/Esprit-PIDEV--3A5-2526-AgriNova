@@ -30,7 +30,7 @@ final class DashboardController
             'ADMIN' => new RedirectResponse('/admin/users'),
             'CLIENT' => new RedirectResponse('/client'),
             'LIVREUR' => new RedirectResponse('/livreur'),
-            'AGRICULTEUR' => new RedirectResponse('/agriculteur'),
+            'AGRICULTEUR' => new RedirectResponse('/agriculteur/home'),
             default => new RedirectResponse('/login'),
         };
     }

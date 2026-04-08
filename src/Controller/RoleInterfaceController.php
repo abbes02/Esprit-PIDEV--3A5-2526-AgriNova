@@ -23,9 +23,21 @@ final class RoleInterfaceController
     }
 
     #[Route('/agriculteur', name: 'app_agriculteur_interface', methods: ['GET'])]
-    public function agriculteur(Request $request, Environment $twig): Response
+    public function agriculteur(Request $request): Response
     {
-        return $this->renderRolePage($request, 'AGRICULTEUR', 'role/agriculteur.html.twig', 'agriculteur', $twig);
+        $user = $request->getSession()->get('auth_user');
+
+        if (!is_array($user)) {
+            return new RedirectResponse('/login');
+        }
+
+        $userRole = strtoupper((string) ($user['role'] ?? ''));
+
+        if ($userRole !== 'AGRICULTEUR') {
+            return new RedirectResponse('/dashboard');
+        }
+
+        return new RedirectResponse('/agriculteur/home');
     }
 
     private function renderRolePage(

@@ -28,63 +28,65 @@
                     </p>
                 </div>
 
-                {% if error_message %}
-                    <p class="alert alert-error">{{ error_message }}</p>
-                {% endif %}
+                {{ form_start(form, {'attr': {'class': 'auth-stack', 'novalidate': 'novalidate'}}) }}
+                    {{ form_errors(form) }}
 
-                <form class="auth-stack" method="post" action="/register">
                     <div class="auth-row">
-                        <label for="nom">
-                            Nom
-                            <input id="nom" name="nom" type="text" value="{{ values.nom }}" required>
-                        </label>
+                        <div>
+                            {{ form_label(form.nom) }}
+                            {{ form_widget(form.nom, {'attr': {'id': form.nom.vars.id}}) }}
+                            {{ form_errors(form.nom) }}
+                        </div>
 
-                        <label for="prenom">
-                            Prenom
-                            <input id="prenom" name="prenom" type="text" value="{{ values.prenom }}" required>
-                        </label>
+                        <div>
+                            {{ form_label(form.prenom) }}
+                            {{ form_widget(form.prenom, {'attr': {'id': form.prenom.vars.id}}) }}
+                            {{ form_errors(form.prenom) }}
+                        </div>
                     </div>
 
-                    <label for="email">
-                        Email
-                        <input id="email" name="email" type="email" value="{{ values.email }}" required>
-                    </label>
-
-                    <div class="auth-row">
-                        <label for="telephone">
-                            Telephone
-                            <input id="telephone" name="telephone" type="text" value="{{ values.telephone }}" placeholder="21612345678">
-                        </label>
-
-                        <label for="role">
-                            Role
-                            <select id="role" name="role" required>
-                                {% for role in allowed_roles %}
-                                    <option value="{{ role }}" {% if values.role == role %}selected{% endif %}>{{ role }}</option>
-                                {% endfor %}
-                            </select>
-                        </label>
+                    <div>
+                        {{ form_label(form.email) }}
+                        {{ form_widget(form.email, {'attr': {'id': form.email.vars.id}}) }}
+                        {{ form_errors(form.email) }}
                     </div>
 
-                    <label for="adresse">
-                        Adresse
-                        <input id="adresse" name="adresse" type="text" value="{{ values.adresse }}" required>
-                    </label>
+                    <div class="auth-row">
+                        <div>
+                            {{ form_label(form.telephone) }}
+                            {{ form_widget(form.telephone, {'attr': {'id': form.telephone.vars.id, 'placeholder': '21612345678'}}) }}
+                            {{ form_errors(form.telephone) }}
+                        </div>
+
+                        <div>
+                            {{ form_label(form.role) }}
+                            {{ form_widget(form.role, {'attr': {'id': form.role.vars.id}}) }}
+                            {{ form_errors(form.role) }}
+                        </div>
+                    </div>
+
+                    <div>
+                        {{ form_label(form.adresse) }}
+                        {{ form_widget(form.adresse, {'attr': {'id': form.adresse.vars.id}}) }}
+                        {{ form_errors(form.adresse) }}
+                    </div>
 
                     <div class="auth-row">
-                        <label for="password">
-                            Mot de passe
-                            <input id="password" name="password" type="password" minlength="6" required>
-                        </label>
+                        <div>
+                            {{ form_label(form.motDePasse.first) }}
+                            {{ form_widget(form.motDePasse.first, {'attr': {'id': form.motDePasse.first.vars.id}}) }}
+                            {{ form_errors(form.motDePasse.first) }}
+                        </div>
 
-                        <label for="password_confirmation">
-                            Confirmation
-                            <input id="password_confirmation" name="password_confirmation" type="password" minlength="6" required>
-                        </label>
+                        <div>
+                            {{ form_label(form.motDePasse.second) }}
+                            {{ form_widget(form.motDePasse.second, {'attr': {'id': form.motDePasse.second.vars.id}}) }}
+                            {{ form_errors(form.motDePasse.second) }}
+                        </div>
                     </div>
 
                     <button type="submit" class="primary-action">Creer mon compte</button>
-                </form>
+                {{ form_end(form) }}
 
                 <p class="helper-text">
                     Vous avez deja un compte ?

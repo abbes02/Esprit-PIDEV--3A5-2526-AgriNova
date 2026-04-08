@@ -489,24 +489,34 @@ const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2(10, 10);
 let selectedPlant = null;
 let selectedParcel = null;
+let activeParcelId = null;
+
+function syncParcelleFocus() {
+  const visibleParcelId =
+    pageId === "parcelles" && selectedParcel
+      ? String(selectedParcel.userData.recordId)
+      : activeParcelId;
+
+  for (const target of interactiveParcels) {
+    const isVisible = String(target.userData.recordId) === String(visibleParcelId);
+    if (target.userData.labelElement) {
+      target.userData.labelElement.classList.toggle("is-hidden", !isVisible);
+    }
+    if (target.userData.labelObject) {
+      target.userData.labelObject.visible = isVisible;
+    }
+  }
+
+  if (pageId === "parcelles") {
+    sceneSteps.forEach((step) => {
+      step.classList.toggle("is-active", step.dataset.sceneId === String(visibleParcelId));
+    });
+  }
+}
 
 function setSelectedParcel(parcel) {
   selectedParcel = parcel || null;
-  for (const target of interactiveParcels) {
-    const isSelected = target === selectedParcel;
-    if (target.userData.labelElement) {
-      target.userData.labelElement.classList.toggle("is-hidden", !isSelected);
-    }
-    if (target.userData.labelObject) {
-      target.userData.labelObject.visible = isSelected;
-    }
-  }
-  if (pageId === "parcelles") {
-    sceneSteps.forEach((step) => step.classList.remove("is-active"));
-    if (selectedParcel) {
-      sceneStepById.get(String(selectedParcel.userData.recordId))?.classList.add("is-active");
-    }
-  }
+  syncParcelleFocus();
 }
 
 function setSelectedPlant(marker) {
@@ -520,10 +530,6 @@ function setSelectedPlant(marker) {
       plant.userData.labelObject.visible = isSelected;
     }
   }
-}
-
-if (pageId === "parcelles") {
-  setSelectedParcel(null);
 }
 
 for (const plant of interactivePlants) {
@@ -635,12 +641,20 @@ const sceneStepById = new Map(
   sceneSteps.map((step) => [String(step.dataset.sceneId), step])
 );
 
+if (pageId === "parcelles") {
+  setSelectedParcel(null);
+}
+
 function setActiveParcel(parcelId) {
+  activeParcelId = String(parcelId);
+
   if (pageId !== "parcelles") {
     sceneSteps.forEach((step) => {
       step.classList.toggle("is-active", step.dataset.sceneId === String(parcelId));
     });
   }
+
+  syncParcelleFocus();
 
   for (const parcel of parcelMeshes) {
     const isActive = parcel.userData.recordId === String(parcelId);

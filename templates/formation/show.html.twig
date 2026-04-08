@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ formation.titre }}{% endblock %}
+{% block breadcrumb %}Formations › {{ formation.titre }}{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <h1>{{ formation.titre }}</h1>
+    <div style="display:flex;gap:10px">
+        <a href="{{ path('formation_edit', {id: formation.id}) }}" class="btn btn-amber">✏️ Modifier</a>
+        <a href="{{ path('formation_index') }}" class="btn btn-outline">← Retour</a>
+    </div>
+</div>
+
+<div class="detail-grid">
+    <div class="detail-cell">
+        <div class="detail-label">Domaine</div>
+        <div class="detail-value">{{ formation.domaine }}</div>
+    </div>
+    <div class="detail-cell">
+        <div class="detail-label">Niveau</div>
+        <div class="detail-value">{{ formation.niveau }}</div>
+    </div>
+    <div class="detail-cell">
+        <div class="detail-label">Durée</div>
+        <div class="detail-value">{{ formation.dureeHeures }} heures</div>
+    </div>
+    <div class="detail-cell">
+        <div class="detail-label">Prix</div>
+        <div class="detail-value" style="color:#7ed87e;font-weight:700;font-size:1.1rem">{{ formation.prix }} €</div>
+    </div>
+    <div class="detail-cell">
+        <div class="detail-label">Date de création</div>
+        <div class="detail-value">{{ formation.dateCreation|date('d/m/Y') }}</div>
+    </div>
+    <div class="detail-cell">
+        <div class="detail-label">Statut</div>
+        <div class="detail-value">
+            {% if formation.statut == 'actif' %}
+                <span class="badge badge-green">{{ formation.statut }}</span>
+            {% elseif formation.statut == 'inactif' %}
+                <span class="badge badge-red">{{ formation.statut }}</span>
+            {% else %}
+                <span class="badge badge-gray">{{ formation.statut }}</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="detail-cell full">
+        <div class="detail-label">Description</div>
+        <div class="detail-value" style="line-height:1.7">{{ formation.description }}</div>
+    </div>
+</div>
+
+{# ── Linked events ── #}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <h2 style="font-size:1.1rem;font-weight:700;color:#a8d8a8">
+        📅 Événements liés
+        <span class="badge badge-gray" style="margin-left:8px">{{ formation.evenements|length }}</span>
+    </h2>
+    <a href="{{ path('evenement_new') }}" class="btn btn-green btn-sm">➕ Ajouter un événement</a>
+</div>
+
+{% if formation.evenements is empty %}
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:32px;text-align:center;color:var(--text-dim)">
+        Aucun événement pour cette formation.
+    </div>
+{% else %}
+    <div class="event-list">
+        {% for e in formation.evenements %}
+        <div class="event-item">
+            <div>
+                <div class="event-item-info">📍 {{ e.lieu }} — {{ e.type }}</div>
+                <div class="event-item-date">{{ e.dateDebut|date('d/m/Y H:i') }} → {{ e.dateFin|date('d/m/Y H:i') }}</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+                {% if e.statut == 'planifie' %}
+                    <span class="badge badge-blue">{{ e.statut }}</span>
+                {% elseif e.statut == 'en_cours' %}
+                    <span class="badge badge-green">{{ e.statut }}</span>
+                {% elseif e.statut == 'termine' %}
+                    <span class="badge badge-gray">{{ e.statut }}</span>
+                {% else %}
+                    <span class="badge badge-red">{{ e.statut }}</span>
+                {% endif %}
+                <a href="{{ path('evenement_show', {id: e.id}) }}" class="btn btn-teal btn-sm">Voir</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

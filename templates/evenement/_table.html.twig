@@ -1,0 +1,48 @@
+{% for e in evenements %}
+<tr>
+    <td style="font-weight:600;color:#c8e8c8">{{ e.formation.titre }}</td>
+    <td>{{ e.lieu }}</td>
+    <td>
+        {% if e.type == 'presentiel' %}
+            <span class="badge badge-green">{{ e.type }}</span>
+        {% elseif e.type == 'en_ligne' %}
+            <span class="badge badge-blue">{{ e.type }}</span>
+        {% else %}
+            <span class="badge badge-amber">{{ e.type }}</span>
+        {% endif %}
+    </td>
+    <td style="font-size:0.82rem">{{ e.dateDebut|date('d/m/Y H:i') }}</td>
+    <td style="font-size:0.82rem">{{ e.dateFin|date('d/m/Y H:i') }}</td>
+    <td>{{ e.capaciteMax }}</td>
+    <td>
+        <span style="color:{% if e.nombreInscrits >= e.capaciteMax %}#e07070{% else %}#7ed87e{% endif %};font-weight:600">
+            {{ e.nombreInscrits }}
+        </span>
+        <span style="color:var(--text-dim);font-size:0.78rem"> / {{ e.capaciteMax }}</span>
+    </td>
+    <td>
+        {% if e.statut == 'planifie' %}
+            <span class="badge badge-blue">{{ e.statut }}</span>
+        {% elseif e.statut == 'en_cours' %}
+            <span class="badge badge-green">{{ e.statut }}</span>
+        {% elseif e.statut == 'termine' %}
+            <span class="badge badge-gray">{{ e.statut }}</span>
+        {% else %}
+            <span class="badge badge-red">{{ e.statut }}</span>
+        {% endif %}
+    </td>
+    <td>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <a href="{{ path('evenement_show', {id: e.id}) }}" class="btn btn-green btn-sm">👁 Voir</a>
+            <a href="{{ path('evenement_edit', {id: e.id}) }}" class="btn btn-green btn-sm">✏️ Modifier</a>
+            <form method="post" action="{{ path('evenement_delete', {id: e.id}) }}" style="display:inline"
+                  onsubmit="return confirm('Supprimer cet événement ?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ e.id) }}">
+                <button class="btn btn-green btn-sm">🗑 Supprimer</button>
+            </form>
+        </div>
+    </td>
+</tr>
+{% else %}
+<tr class="empty-row"><td colspan="9">Aucun événement trouvé.</td></tr>
+{% endfor %}

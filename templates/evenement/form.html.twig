@@ -1,0 +1,83 @@
+{% extends 'parcelle/base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<section class="auth-shell ui">
+    <aside class="auth-box glass parallax reveal" data-speed="0.12">
+        <div>
+            <p class="eyebrow">Evenement</p>
+            <h1 class="reveal-text">{{ title }}</h1>
+            <p class="hero-text">Composez un evenement avec le meme style de box que le formulaire register.</p>
+        </div>
+
+        {{ form_start(form, { attr: { class: 'auth-stack', novalidate: 'novalidate' } }) }}
+            {{ form_errors(form) }}
+
+            <div>
+                {{ form_label(form.formation) }}
+                {{ form_widget(form.formation) }}
+                {{ form_errors(form.formation) }}
+            </div>
+
+            <div class="auth-row">
+                <div>
+                    {{ form_label(form.dateDebut) }}
+                    {{ form_widget(form.dateDebut) }}
+                    {{ form_errors(form.dateDebut) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.dateFin) }}
+                    {{ form_widget(form.dateFin) }}
+                    {{ form_errors(form.dateFin) }}
+                </div>
+            </div>
+
+            <div class="auth-row">
+                <div>
+                    {{ form_label(form.lieu) }}
+                    {{ form_widget(form.lieu, {'attr': {'placeholder': 'Lieu de l evenement'}}) }}
+                    {{ form_errors(form.lieu) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.type) }}
+                    {{ form_widget(form.type, {'attr': {'placeholder': 'Type d evenement'}}) }}
+                    {{ form_errors(form.type) }}
+                </div>
+            </div>
+
+            <div class="auth-row">
+                <div>
+                    {{ form_label(form.capaciteMax) }}
+                    {{ form_widget(form.capaciteMax, {'attr': {'placeholder': 'Capacite maximale'}}) }}
+                    {{ form_errors(form.capaciteMax) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.nombreInscrits) }}
+                    {{ form_widget(form.nombreInscrits, {'attr': {'placeholder': 'Nombre d inscrits'}}) }}
+                    {{ form_errors(form.nombreInscrits) }}
+                </div>
+            </div>
+
+            <div>
+                {{ form_label(form.statut) }}
+                {{ form_widget(form.statut) }}
+                {{ form_errors(form.statut) }}
+            </div>
+
+            <div class="stack-sm">
+                <button class="primary-action" type="submit">Enregistrer</button>
+                <a href="{{ path('evenement_index') }}" class="button-secondary">Annuler</a>
+            </div>
+        {{ form_end(form) }}
+
+        <p class="helper-text">
+            Retour a la liste
+            <a class="link" href="{{ path('evenement_index') }}">des evenements</a>
+        </p>
+    </aside>
+</section>
+{% endblock %}

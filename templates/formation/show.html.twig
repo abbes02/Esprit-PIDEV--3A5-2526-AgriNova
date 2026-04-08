@@ -1,0 +1,83 @@
+{% extends 'parcelle/base.html.twig' %}
+
+{% block title %}{{ formation.titre }}{% endblock %}
+
+{% block body %}
+{% set currentRole = (app.session.get('auth_user')['role'] ?? '')|upper %}
+<section class="page-panel reveal">
+    <div class="section-head">
+        <div>
+            <div class="section-kicker"><i class="bi bi-book"></i> Detail</div>
+            <h1 class="page-title reveal-text">{{ formation.titre }}</h1>
+        </div>
+        <div class="stack-sm">
+            {% if currentRole == 'ADMIN' %}
+            <a href="{{ path('formation_edit', { id: formation.id }) }}" class="button-primary">Modifier</a>
+            {% endif %}
+            <a href="{{ path('formation_index') }}" class="button-secondary">Retour</a>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+        <article class="info-card">
+            <div class="muted">Domaine</div>
+            <strong>{{ formation.domaine }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Niveau</div>
+            <strong>{{ formation.niveau }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Duree</div>
+            <strong>{{ formation.dureeHeures }} heures</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Prix</div>
+            <strong>{{ formation.prix }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Date de creation</div>
+            <strong>{{ formation.dateCreation|date('d/m/Y') }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Statut</div>
+            <strong>{{ formation.statut }}</strong>
+        </article>
+    </div>
+
+    <article class="info-card mt-4">
+        <div class="section-kicker"><i class="bi bi-card-text"></i> Description</div>
+        <p class="mb-0 mt-3">{{ formation.description }}</p>
+    </article>
+
+    <article class="info-card mt-4">
+        <div class="section-head">
+            <div>
+                <div class="section-kicker"><i class="bi bi-calendar-event"></i> Evenements lies</div>
+                <h2 class="h4 mb-0">{{ formation.evenements|length }} evenement(s)</h2>
+            </div>
+            {% if currentRole == 'ADMIN' %}
+            <a href="{{ path('evenement_new') }}" class="button-secondary">Ajouter un evenement</a>
+            {% endif %}
+        </div>
+
+        {% if formation.evenements is empty %}
+            <p class="muted mb-0">Aucun evenement pour cette formation.</p>
+        {% else %}
+            <div class="listing-grid">
+                {% for evenement in formation.evenements %}
+                    <article class="data-card">
+                        <div class="section-kicker"><i class="bi bi-geo-alt"></i> {{ evenement.lieu }}</div>
+                        <h3 class="h5 mt-2">{{ evenement.type }}</h3>
+                        <p class="muted mb-3">{{ evenement.dateDebut|date('d/m/Y H:i') }} - {{ evenement.dateFin|date('d/m/Y H:i') }}</p>
+                        <div class="stack-sm">
+                            <span class="badge-soft">{{ evenement.statut }}</span>
+                            <a href="{{ path('evenement_show', { id: evenement.id }) }}" class="button-secondary">Voir</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </article>
+</section>
+{% endblock %}

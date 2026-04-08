@@ -455,11 +455,12 @@ final class AdminUserController
 
     /**
      * @param list<array<string, mixed>> $users
-     * @return array{CLIENT: int, LIVREUR: int, AGRICULTEUR: int}
+     * @return array{ADMIN: int, CLIENT: int, LIVREUR: int, AGRICULTEUR: int}
      */
     private function buildRoleStats(array $users): array
     {
         $stats = [
+            'ADMIN' => 0,
             'CLIENT' => 0,
             'LIVREUR' => 0,
             'AGRICULTEUR' => 0,

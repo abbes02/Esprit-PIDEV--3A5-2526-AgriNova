@@ -1,0 +1,27 @@
+{% set currentRole = (app.session.get('auth_user')['role'] ?? '')|upper %}
+{% for formation in formations %}
+    <tr>
+        <td>{{ formation.titre }}</td>
+        <td>{{ formation.domaine }}</td>
+        <td>{{ formation.niveau }}</td>
+        <td>{{ formation.dureeHeures }} h</td>
+        <td>{{ formation.prix }}</td>
+        <td><span class="badge-soft">{{ formation.statut }}</span></td>
+        <td>
+            <div class="stack-sm">
+                <a href="{{ path('formation_show', { id: formation.id }) }}" class="button-secondary">Voir</a>
+                {% if currentRole == 'ADMIN' %}
+                <a href="{{ path('formation_edit', { id: formation.id }) }}" class="button-primary">Modifier</a>
+                <form method="post" action="{{ path('formation_delete', { id: formation.id }) }}" onsubmit="return confirm('Supprimer cette formation ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ formation.id) }}">
+                    <button class="button-success" type="submit">Supprimer</button>
+                </form>
+                {% endif %}
+            </div>
+        </td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="7" class="text-center muted py-4">Aucune formation trouvee.</td>
+    </tr>
+{% endfor %}

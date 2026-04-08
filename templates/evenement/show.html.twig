@@ -1,0 +1,52 @@
+{% extends 'parcelle/base.html.twig' %}
+
+{% block title %}{{ evenement.lieu }}{% endblock %}
+
+{% block body %}
+{% set currentRole = (app.session.get('auth_user')['role'] ?? '')|upper %}
+<section class="page-panel reveal">
+    <div class="section-head">
+        <div>
+            <div class="section-kicker"><i class="bi bi-calendar-event"></i> Detail</div>
+            <h1 class="page-title reveal-text">{{ evenement.lieu }}</h1>
+        </div>
+        <div class="stack-sm">
+            {% if currentRole == 'ADMIN' %}
+            <a href="{{ path('evenement_edit', { id: evenement.id }) }}" class="button-primary">Modifier</a>
+            {% endif %}
+            <a href="{{ path('evenement_index') }}" class="button-secondary">Retour</a>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+        <article class="info-card">
+            <div class="muted">Formation</div>
+            <strong>{{ evenement.formation.titre }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Type</div>
+            <strong>{{ evenement.type }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Statut</div>
+            <strong>{{ evenement.statut }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Date de debut</div>
+            <strong>{{ evenement.dateDebut|date('d/m/Y H:i') }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Date de fin</div>
+            <strong>{{ evenement.dateFin|date('d/m/Y H:i') }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Capacite max</div>
+            <strong>{{ evenement.capaciteMax }}</strong>
+        </article>
+        <article class="info-card">
+            <div class="muted">Nombre inscrits</div>
+            <strong>{{ evenement.nombreInscrits }}</strong>
+        </article>
+    </div>
+</section>
+{% endblock %}

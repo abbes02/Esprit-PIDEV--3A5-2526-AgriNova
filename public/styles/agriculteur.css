@@ -332,7 +332,9 @@ body {
 .auth-form input,
 .auth-form select,
 .auth-stack input,
-.auth-stack select {
+.auth-stack select,
+.auth-form textarea,
+.auth-stack textarea {
     width: 100%;
     box-sizing: border-box;
     padding: 0.9rem 0.95rem;
@@ -345,7 +347,9 @@ body {
 }
 
 .auth-form input::placeholder,
-.auth-stack input::placeholder {
+.auth-stack input::placeholder,
+.auth-form textarea::placeholder,
+.auth-stack textarea::placeholder {
     color: rgba(226, 237, 221, 0.46);
 }
 
@@ -672,6 +676,39 @@ body {
 
 .admin-profile-chip .user-meta {
     min-width: 0;
+}
+
+.admin-profile-link {
+    text-decoration: none;
+}
+
+.admin-profile-link .user-avatar {
+    display: grid;
+    place-items: center;
+    color: #f6fbf8;
+    font-size: 1.1rem;
+}
+
+.admin-inline-links {
+    display: flex;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    margin-top: 0.85rem;
+}
+
+.admin-mini-chip {
+    gap: 0.55rem;
+    padding: 0.45rem 0.7rem 0.45rem 0.45rem;
+}
+
+.admin-mini-chip .user-avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 0.95rem;
+}
+
+.admin-mini-chip .user-name {
+    font-size: 0.9rem;
 }
 
 .admin-profile-panel {

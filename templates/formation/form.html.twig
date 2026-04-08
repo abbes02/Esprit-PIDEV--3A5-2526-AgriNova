@@ -1,0 +1,83 @@
+{% extends 'parcelle/base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<section class="auth-shell ui">
+    <aside class="auth-box glass parallax reveal" data-speed="0.12">
+        <div>
+            <p class="eyebrow">Formation</p>
+            <h1 class="reveal-text">{{ title }}</h1>
+            <p class="hero-text">Gerez les details de la formation avec la meme presentation que l inscription.</p>
+        </div>
+
+        {{ form_start(form, { attr: { class: 'auth-stack', novalidate: 'novalidate' } }) }}
+            {{ form_errors(form) }}
+
+            <div>
+                {{ form_label(form.titre) }}
+                {{ form_widget(form.titre, {'attr': {'placeholder': 'Nom de la formation'}}) }}
+                {{ form_errors(form.titre) }}
+            </div>
+
+            <div class="auth-row">
+                <div>
+                    {{ form_label(form.domaine) }}
+                    {{ form_widget(form.domaine, {'attr': {'placeholder': 'Ex: Agriculture durable'}}) }}
+                    {{ form_errors(form.domaine) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.niveau) }}
+                    {{ form_widget(form.niveau) }}
+                    {{ form_errors(form.niveau) }}
+                </div>
+            </div>
+
+            <div>
+                {{ form_label(form.description) }}
+                {{ form_widget(form.description, {'attr': {'placeholder': 'Description de la formation'}}) }}
+                {{ form_errors(form.description) }}
+            </div>
+
+            <div class="auth-row">
+                <div>
+                    {{ form_label(form.dureeHeures) }}
+                    {{ form_widget(form.dureeHeures, {'attr': {'placeholder': 'Nombre d heures'}}) }}
+                    {{ form_errors(form.dureeHeures) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.prix) }}
+                    {{ form_widget(form.prix, {'attr': {'placeholder': 'Prix'}}) }}
+                    {{ form_errors(form.prix) }}
+                </div>
+            </div>
+
+            <div class="auth-row">
+                <div>
+                    {{ form_label(form.dateCreation) }}
+                    {{ form_widget(form.dateCreation) }}
+                    {{ form_errors(form.dateCreation) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.statut) }}
+                    {{ form_widget(form.statut) }}
+                    {{ form_errors(form.statut) }}
+                </div>
+            </div>
+
+            <div class="stack-sm">
+                <button class="primary-action" type="submit">Enregistrer</button>
+                <a href="{{ path('formation_index') }}" class="button-secondary">Annuler</a>
+            </div>
+        {{ form_end(form) }}
+
+        <p class="helper-text">
+            Retour a la liste
+            <a class="link" href="{{ path('formation_index') }}">des formations</a>
+        </p>
+    </aside>
+</section>
+{% endblock %}

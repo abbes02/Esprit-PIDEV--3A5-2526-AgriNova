@@ -3,6 +3,7 @@
 {% block title %}{{ formation.titre }}{% endblock %}
 
 {% block body %}
+{% set currentRole = (app.session.get('auth_user')['role'] ?? '')|upper %}
 <section class="page-panel reveal">
     <div class="section-head">
         <div>
@@ -10,7 +11,9 @@
             <h1 class="page-title reveal-text">{{ formation.titre }}</h1>
         </div>
         <div class="stack-sm">
+            {% if currentRole == 'ADMIN' %}
             <a href="{{ path('formation_edit', { id: formation.id }) }}" class="button-primary">Modifier</a>
+            {% endif %}
             <a href="{{ path('formation_index') }}" class="button-secondary">Retour</a>
         </div>
     </div>
@@ -53,7 +56,9 @@
                 <div class="section-kicker"><i class="bi bi-calendar-event"></i> Evenements lies</div>
                 <h2 class="h4 mb-0">{{ formation.evenements|length }} evenement(s)</h2>
             </div>
+            {% if currentRole == 'ADMIN' %}
             <a href="{{ path('evenement_new') }}" class="button-secondary">Ajouter un evenement</a>
+            {% endif %}
         </div>
 
         {% if formation.evenements is empty %}

@@ -3,6 +3,7 @@
 {% block title %}Formations{% endblock %}
 
 {% block body %}
+{% set currentRole = (app.session.get('auth_user')['role'] ?? '')|upper %}
 <section class="page-panel reveal">
     <div class="section-head">
         <div>
@@ -10,10 +11,12 @@
             <h1 class="page-title reveal-text">Formations</h1>
             <p class="page-intro">{{ formations|length }} resultat(s) disponibles.</p>
         </div>
+        {% if currentRole == 'ADMIN' %}
         <div class="stack-sm">
             <a href="{{ path('formation_pdf', { q: q }) }}" class="button-secondary">Exporter PDF</a>
             <a href="{{ path('formation_new') }}" class="button-primary">Nouvelle formation</a>
         </div>
+        {% endif %}
     </div>
 
     <form class="search-form mb-4" method="get">

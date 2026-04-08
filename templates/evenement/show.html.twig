@@ -3,6 +3,7 @@
 {% block title %}{{ evenement.lieu }}{% endblock %}
 
 {% block body %}
+{% set currentRole = (app.session.get('auth_user')['role'] ?? '')|upper %}
 <section class="page-panel reveal">
     <div class="section-head">
         <div>
@@ -10,7 +11,9 @@
             <h1 class="page-title reveal-text">{{ evenement.lieu }}</h1>
         </div>
         <div class="stack-sm">
+            {% if currentRole == 'ADMIN' %}
             <a href="{{ path('evenement_edit', { id: evenement.id }) }}" class="button-primary">Modifier</a>
+            {% endif %}
             <a href="{{ path('evenement_index') }}" class="button-secondary">Retour</a>
         </div>
     </div>

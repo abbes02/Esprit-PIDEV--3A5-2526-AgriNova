@@ -44,6 +44,10 @@
                             <span class="chip-label">Clients</span>
                             <strong>{{ role_stats.CLIENT }}</strong>
                         </div>
+                        <div class="admin-stat">
+                            <span class="chip-label">Admins</span>
+                            <strong>{{ role_stats.ADMIN }}</strong>
+                        </div>
                         <div class="admin-stat admin-stat-profile">
                             <span class="chip-label">Admin</span>
                             <button
@@ -64,6 +68,25 @@
                             </button>
                         </div>
                     </div>
+                </div>
+
+                <div class="admin-inline-links" style="margin-bottom: 1rem;">
+                    <a href="{{ path('formation_index') }}" class="admin-profile-trigger admin-profile-chip admin-profile-link admin-mini-chip">
+                        <span class="user-avatar">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </span>
+                        <span class="user-meta">
+                            <span class="user-name">Formations</span>
+                        </span>
+                    </a>
+                    <a href="{{ path('evenement_index') }}" class="admin-profile-trigger admin-profile-chip admin-profile-link admin-mini-chip">
+                        <span class="user-avatar">
+                            <i class="bi bi-calendar-event-fill"></i>
+                        </span>
+                        <span class="user-meta">
+                            <span class="user-name">Evenements</span>
+                        </span>
+                    </a>
                 </div>
 
                 {% for message in alerts.success %}

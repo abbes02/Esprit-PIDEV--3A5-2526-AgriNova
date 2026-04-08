@@ -1,3 +1,4 @@
+{% set currentRole = (app.session.get('auth_user')['role'] ?? '')|upper %}
 {% for evenement in evenements %}
     <tr>
         <td>{{ evenement.formation.titre }}</td>
@@ -11,11 +12,13 @@
         <td>
             <div class="stack-sm">
                 <a href="{{ path('evenement_show', { id: evenement.id }) }}" class="button-secondary">Voir</a>
+                {% if currentRole == 'ADMIN' %}
                 <a href="{{ path('evenement_edit', { id: evenement.id }) }}" class="button-primary">Modifier</a>
                 <form method="post" action="{{ path('evenement_delete', { id: evenement.id }) }}" onsubmit="return confirm('Supprimer cet evenement ?');">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evenement.id) }}">
                     <button class="button-success" type="submit">Supprimer</button>
                 </form>
+                {% endif %}
             </div>
         </td>
     </tr>

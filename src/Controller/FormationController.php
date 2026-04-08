@@ -19,7 +19,7 @@ class FormationController extends AbstractController
     #[Route('', name: 'formation_index', methods: ['GET'])]
     public function index(Request $request, FormationRepository $repo): Response
     {
-        if (($guard = $this->denyUnlessAgriculteur($request)) !== null) {
+        if (($guard = $this->denyUnlessViewer($request)) !== null) {
             return $guard;
         }
 
@@ -39,7 +39,7 @@ class FormationController extends AbstractController
     #[Route('/pdf', name: 'formation_pdf', methods: ['GET'])]
     public function pdf(Request $request, FormationRepository $repo, PdfService $pdf): Response
     {
-        if (($guard = $this->denyUnlessAgriculteur($request)) !== null) {
+        if (($guard = $this->denyUnlessAdmin($request)) !== null) {
             return $guard;
         }
 
@@ -53,7 +53,7 @@ class FormationController extends AbstractController
     #[Route('/new', name: 'formation_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
-        if (($guard = $this->denyUnlessAgriculteur($request)) !== null) {
+        if (($guard = $this->denyUnlessAdmin($request)) !== null) {
             return $guard;
         }
 
@@ -78,7 +78,7 @@ class FormationController extends AbstractController
     #[Route('/{id}', name: 'formation_show', methods: ['GET'])]
     public function show(Request $request, Formation $formation): Response
     {
-        if (($guard = $this->denyUnlessAgriculteur($request)) !== null) {
+        if (($guard = $this->denyUnlessViewer($request)) !== null) {
             return $guard;
         }
 
@@ -88,7 +88,7 @@ class FormationController extends AbstractController
     #[Route('/{id}/edit', name: 'formation_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Formation $formation, EntityManagerInterface $em): Response
     {
-        if (($guard = $this->denyUnlessAgriculteur($request)) !== null) {
+        if (($guard = $this->denyUnlessAdmin($request)) !== null) {
             return $guard;
         }
 
@@ -111,7 +111,7 @@ class FormationController extends AbstractController
     #[Route('/{id}/delete', name: 'formation_delete', methods: ['POST'])]
     public function delete(Request $request, Formation $formation, EntityManagerInterface $em): Response
     {
-        if (($guard = $this->denyUnlessAgriculteur($request)) !== null) {
+        if (($guard = $this->denyUnlessAdmin($request)) !== null) {
             return $guard;
         }
 
@@ -124,7 +124,7 @@ class FormationController extends AbstractController
         return $this->redirectToRoute('formation_index');
     }
 
-    private function denyUnlessAgriculteur(Request $request): ?RedirectResponse
+    private function denyUnlessViewer(Request $request): ?RedirectResponse
     {
         $user = $request->getSession()->get('auth_user');
 
@@ -134,8 +134,25 @@ class FormationController extends AbstractController
 
         $role = strtoupper((string) ($user['role'] ?? ''));
 
-        if ($role !== 'AGRICULTEUR') {
+        if (!in_array($role, ['ADMIN', 'AGRICULTEUR', 'CLIENT'], true)) {
             return new RedirectResponse('/dashboard');
+        }
+
+        return null;
+    }
+
+    private function denyUnlessAdmin(Request $request): ?RedirectResponse
+    {
+        $user = $request->getSession()->get('auth_user');
+
+        if (!is_array($user)) {
+            return new RedirectResponse('/login');
+        }
+
+        $role = strtoupper((string) ($user['role'] ?? ''));
+
+        if ($role !== 'ADMIN') {
+            return new RedirectResponse('/formations');
         }
 
         return null;

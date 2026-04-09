@@ -1,0 +1,440 @@
+{% set disable_3d = true %}
+{% extends 'base.html.twig' %}
+
+{% block title %}ModifierProduitAgricole{% endblock %}
+
+{% block body %}
+<div class="product-page">
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<main class="ui product-space">
+    <header class="topbar">
+        <div class="topbar-left">
+            <a class="app-name app-name-link" href="{{ path('backoffice_produit_iot_afficher') }}">AGRINOVA</a>
+            <span class="time" id="time">--:--</span>
+            <span class="temp">24&deg;C</span>
+        </div>
+        <div class="topbar-right">
+            <label class="sr-only" for="weather">Weather</label>
+            <select id="weather" class="glass-select">
+                <option>Ensoleille</option>
+                <option>Nuageux</option>
+                <option>Pluvieux</option>
+                <option>Neigeux</option>
+            </select>
+
+            <label class="sr-only" for="timeOfDay">Time of day</label>
+            <select id="timeOfDay" class="glass-select">
+                <option>Matin</option>
+                <option>Coucher de soleil</option>
+                <option>Nuit</option>
+            </select>
+
+            <label class="sr-only" for="lang">Language</label>
+            <select id="lang" class="glass-select">
+                <option>Francais</option>
+                <option>English</option>
+                <option>Arabic</option>
+            </select>
+
+            <label class="sr-only" for="currency">Currency</label>
+            <select id="currency" class="glass-select">
+                <option>DT</option>
+                <option>USD</option>
+                <option>EUR</option>
+                <option>GBP</option>
+                <option>JPY</option>
+            </select>
+
+            <button class="glass-btn" type="button">ChatBot</button>
+            <a class="glass-btn" data-account-link href="{{ path('profile_produit_agricole') }}">Compte</a>
+
+            <div class="user-chip">
+                <div class="user-avatar">
+                    <a href="{{ path('app_home') }}">
+                        <img src="/logo.png" alt="User avatar" />
+                    </a>
+                </div>
+                <div class="user-meta">
+                    <span class="user-name">Saidi Ben</span>
+                    <span class="user-email">saidi@agrinova.tn</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-logo-container">
+                <div class="sidebar-logo-circle">
+                    <a href="{{ path('app_home') }}">
+                        <img src="/logo.png" alt="AGRINOVA logo" />
+                    </a>
+                </div>
+                <div class="sidebar-logo-text">
+                    <div class="sidebar-logo-label">AGRINOVA</div>
+                    <div class="sidebar-subtitle">L'EXCELLENCE RURALE</div>
+                </div>
+            </div>
+
+            <div class="sidebar-separator"></div>
+
+            <nav class="sidebar-buttons">
+                <a class="sidebar-button" href="#">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/>
+                    </svg>
+                    Parcelles
+                </a>
+                <a class="sidebar-button" href="#">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 2l7 4v6c0 5-3.8 9.7-7 10-3.2-.3-7-5-7-10V6l7-4z"/>
+                    </svg>
+                    Produits IOT
+                </a>
+                <a class="sidebar-button active" href="{{ path('produit_agricole_list') }}">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 3C7 3 4 7 4 11c0 4 3 7 8 10 5-3 8-6 8-10 0-4-3-8-8-8z"/>
+                    </svg>
+                    Produits Agricoles
+                </a>
+                <a class="sidebar-button" href="#">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 7h16v10H4V7zm2-4h12v2H6V3zm2 14h8v2H8v-2z"/>
+                    </svg>
+                    Materiel
+                </a>
+                <a class="sidebar-button" href="#">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 3l9 4-9 4-9-4 9-4zm-7 6v6l7 3 7-3V9l-7 3-7-3z"/>
+                    </svg>
+                    Formations
+                </a>
+                <a class="sidebar-button" href="#">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM7 12h5v5H7z"/>
+                    </svg>
+                    Evenements
+                </a>
+                <a class="sidebar-button" href="#">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 6h11v8H3V6zm12 2h3l3 3v3h-6V8zM6 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                    </svg>
+                    Livraison
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a class="sidebar-button logout" href="#">Deconnexion</a>
+            </div>
+        </aside>
+
+        <div class="login-wrap product-wrap">
+            <div class="login-card product-card-shell agri-form-shell">
+                <div class="d-flex align-items-center justify-content-between mb-3 agri-title-bar">
+                    <h1 class="mb-0">ModifierProduitAgricole</h1>
+                    <a class="glass-btn" href="{{ path('profile_produit_agricole') }}">Retour</a>
+                </div>
+
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'agri-form', 'id': 'agri-form'}}) }}
+                <div class="agri-form-card">
+                    <div class="agri-grid">
+                        <div class="agri-image-panel">
+                            <label class="agri-form-label">Visuel du Produit</label>
+                            <div class="image-box" id="agri-dropzone">
+                                <div class="image-box-inner">
+                                    <img id="agri-image-preview" class="image-preview" alt="Apercu image" hidden>
+                                    {% if form.image is defined %}
+                                        {{ form_widget(form.image, {'attr': {'class': 'input-field agri-form-field', 'placeholder': 'C:\\Users\\...\\image.jpg'}}) }}
+                                    {% endif %}
+                                    <div class="image-hint" id="agri-image-hint">Glissez-deposez une image ici</div>
+                                    <input type="file" id="agri-image-input" accept="image/*" class="file-input-hidden">
+                                    <button type="button" class="btn-primary" id="agri-image-btn">Parcourir</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="agri-fields">
+                            <div class="section-title">Informations produit</div>
+                            <div class="field-group">
+                                {{ form_label(form.nom, 'Nom du produit', {'label_attr': {'class': 'agri-form-label'}}) }}
+                                {{ form_widget(form.nom, {'attr': {'class': 'input-field agri-form-field', 'placeholder': 'ex: Ble dur Premium', 'pattern': '^[A-Z].{2,}$', 'title': 'Doit commencer par une majuscule et contenir au moins 3 caracteres.'}}) }}
+                                {{ form_errors(form.nom) }}
+                                <small class="field-status" id="help-nom"></small>
+                            </div>
+
+                            <div class="field-row">
+                                <div class="field-group">
+                                    {{ form_label(form.ref, 'Reference', {'label_attr': {'class': 'agri-form-label'}}) }}
+                                    {{ form_widget(form.ref, {'attr': {'class': 'input-field agri-form-field'}}) }}
+                                    {{ form_errors(form.ref) }}
+                                <small class="field-status" id="help-ref"></small>
+                                    <div class="field-help"></div>
+                                </div>
+                                <div class="field-group">
+                                    {{ form_label(form.categorieAgricole, 'Categorie', {'label_attr': {'class': 'agri-form-label'}}) }}
+                                    {{ form_widget(form.categorieAgricole, {'attr': {'class': 'input-field agri-form-field', 'required': 'required'}}) }}
+                                    {{ form_errors(form.categorieAgricole) }}
+                                    <small class="field-status" id="help-cat"></small>
+                                    <div class="field-help"></div>
+                                </div>
+                            </div>
+
+                            <div class="field-row">
+                                <div class="field-group">
+                                    {{ form_label(form.prix, 'Prix (TND)', {'label_attr': {'class': 'agri-form-label'}}) }}
+                                    {{ form_widget(form.prix, {'attr': {'class': 'input-field agri-form-field', 'required': 'required'}}) }}
+                                    {{ form_errors(form.prix) }}
+                                    <small class="field-status" id="help-prix"></small>
+                                    <div class="field-help"></div>
+                                </div>
+                                <div class="field-group">
+                                    {{ form_label(form.quantite, 'Stock Initial', {'label_attr': {'class': 'agri-form-label'}}) }}
+                                    {{ form_widget(form.quantite, {'attr': {'class': 'input-field agri-form-field', 'required': 'required'}}) }}
+                                    {{ form_errors(form.quantite) }}
+                                    <small class="field-status" id="help-stock"></small>
+                                    <div class="field-help"></div>
+                                </div>
+                            </div>
+
+                            <div class="field-group">
+                                {{ form_label(form.dateExpiration, "Date d'expiration", {'label_attr': {'class': 'agri-form-label'}}) }}
+                                <div class="date-field">
+                                    {{ form_widget(form.dateExpiration, {'attr': {'class': 'input-field agri-form-field date-input', 'required': 'required'}}) }}
+                                    <button type="button" class="btn-secondary date-btn" id="date-open-btn" aria-label="Ouvrir le calendrier" title="Ouvrir le calendrier">📅</button>
+                                </div>
+                                {{ form_errors(form.dateExpiration) }}
+                                <small class="field-status" id="help-date"></small>
+                                <div class="field-help"></div>
+                            </div>
+                        </div>
+
+                        <div class="field-group full-width">
+                            <div class="section-title">Details & notes</div>
+                            {{ form_label(form.description, 'Description et notes de culture', {'label_attr': {'class': 'agri-form-label'}}) }}
+                            {{ form_widget(form.description, {'attr': {'class': 'input-field agri-form-field agri-form-textarea'}}) }}
+                            {{ form_errors(form.description) }}
+                        </div>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="reset" class="btn-secondary">Reinitialiser</button>
+                        <div class="agri-submit-wrap">
+                            <button type="submit" class="btn-primary" id="agri-submit" disabled>Enregistrer les modifications</button>
+                            <small class="agri-submit-hint" id="agri-submit-hint" style="display:none"></small>
+                        </div>
+                    </div>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</main>
+<div class="scroll-space" aria-hidden="true"></div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const agriForm = document.getElementById('agri-form');
+            const agriSubmit = document.getElementById('agri-submit');
+            const imageInput = document.getElementById('agri-image-input');
+            const imagePreview = document.getElementById('agri-image-preview');
+            const imageBtn = document.getElementById('agri-image-btn');
+            const dropzone = document.getElementById('agri-dropzone');
+            const imageHint = document.getElementById('agri-image-hint');
+            const refInput = document.getElementById('produit_agricole_ref');
+            const refHint = document.getElementById('help-ref');
+            const expirationInput = document.getElementById('produit_agricole_dateExpiration');
+            const dateOpenBtn = document.getElementById('date-open-btn');
+            let refTimer = null;
+            let refAvailable = true;
+            const initialRef = refInput ? refInput.value.trim() : '';
+
+            const handleFile = (file) => {
+                if (!file) {
+                    return;
+                }
+                if (!file.type.startsWith('image/')) {
+                    if (imageHint) {
+                        imageHint.textContent = 'Veuillez choisir une image valide.';
+                    }
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    if (imagePreview) {
+                        imagePreview.src = reader.result;
+                        imagePreview.hidden = false;
+                    }
+                };
+                reader.readAsDataURL(file);
+            };
+
+            if (imageBtn && imageInput) {
+                imageBtn.addEventListener('click', () => imageInput.click());
+                imageInput.addEventListener('change', (event) => {
+                    const file = event.target.files && event.target.files[0];
+                    handleFile(file);
+                });
+            }
+
+            if (dropzone) {
+                const onDragOver = (event) => {
+                    event.preventDefault();
+                    dropzone.classList.add('is-dragover');
+                };
+                const onDragLeave = () => {
+                    dropzone.classList.remove('is-dragover');
+                };
+                const onDrop = (event) => {
+                    event.preventDefault();
+                    dropzone.classList.remove('is-dragover');
+                    const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+                    handleFile(file);
+                };
+                dropzone.addEventListener('dragover', onDragOver);
+                dropzone.addEventListener('dragleave', onDragLeave);
+                dropzone.addEventListener('drop', onDrop);
+            }
+
+            if (agriForm && agriSubmit) {
+                agriForm.querySelectorAll('input[type="hidden"][required]').forEach((el) => {
+                    el.required = false;
+                });
+                ['produit_agricole_image', 'produit_agricole_description'].forEach((id) => {
+                    const field = document.getElementById(id);
+                    if (field) {
+                        field.required = false;
+                    }
+                });
+
+                const updateSubmitState = () => {
+                    const requiredFields = agriForm.querySelectorAll('input[required], select[required], textarea[required]');
+                    const missing = [];
+                    requiredFields.forEach((field) => {
+                        if (field.disabled || field.type === 'hidden') {
+                            return;
+                        }
+                        if (field.type === 'checkbox' || field.type === 'radio') {
+                            if (!field.checked) {
+                                missing.push(field);
+                            }
+                            return;
+                        }
+                        const value = (field.value || '').trim();
+                        if (value === '') {
+                            missing.push(field);
+                            return;
+                        }
+                        if (field.id === 'produit_agricole_nom') {
+                            const nameOk = /^[A-Z].{2,}$/.test(value);
+                            if (!nameOk) {
+                                missing.push(field);
+                            }
+                        }
+                        if (field.id === 'produit_agricole_dateExpiration') {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            const selected = new Date(value);
+                            if (!(selected > today)) {
+                                missing.push(field);
+                            }
+                        }
+                    });
+
+                    if (refInput && refInput.value.trim() !== '' && refAvailable === false) {
+                        missing.push(refInput);
+                    }
+
+                    const isValid = missing.length === 0;
+                    agriSubmit.disabled = !isValid;
+                    agriSubmit.setAttribute('aria-disabled', String(!isValid));
+
+                    const hint = document.getElementById('agri-submit-hint');
+                    if (hint) {
+                        hint.style.opacity = '0';
+                        hint.textContent = '';
+                    }
+                };
+
+                agriForm.addEventListener('input', updateSubmitState);
+                agriForm.addEventListener('change', updateSubmitState);
+                agriForm.addEventListener('keyup', updateSubmitState);
+                window.addEventListener('load', updateSubmitState);
+                updateSubmitState();
+                setInterval(updateSubmitState, 800);
+            }
+
+            if (refInput && refHint) {
+                const checkRef = async () => {
+                    const value = refInput.value.trim();
+                    if (value === '') {
+                        refAvailable = null;
+                        refHint.textContent = '';
+                        refHint.classList.remove('is-ok', 'is-error');
+                        return;
+                    }
+                    if (value === initialRef) {
+                        refAvailable = true;
+                        refHint.textContent = 'Reference actuelle.';
+                        refHint.classList.add('is-ok');
+                        refHint.classList.remove('is-error');
+                        return;
+                    }
+                    try {
+                        const res = await fetch(`/produit/check-ref?ref=${encodeURIComponent(value)}`);
+                        const data = await res.json();
+                        refAvailable = data && data.available === true;
+                        if (refAvailable) {
+                            refHint.textContent = 'Reference disponible.';
+                            refHint.classList.add('is-ok');
+                            refHint.classList.remove('is-error');
+                        } else {
+                            refHint.textContent = 'Reference deja utilisee.';
+                            refHint.classList.add('is-error');
+                            refHint.classList.remove('is-ok');
+                        }
+                    } catch (e) {
+                        refAvailable = null;
+                        refHint.textContent = 'Verification impossible.';
+                        refHint.classList.add('is-error');
+                        refHint.classList.remove('is-ok');
+                    }
+                };
+
+                const scheduleCheck = () => {
+                    if (refTimer) {
+                        clearTimeout(refTimer);
+                    }
+                    refTimer = setTimeout(checkRef, 350);
+                };
+
+                refInput.addEventListener('input', scheduleCheck);
+                refInput.addEventListener('change', scheduleCheck);
+                checkRef();
+            }
+
+            if (expirationInput) {
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                const minDate = `${yyyy}-${mm}-${dd}`;
+                expirationInput.setAttribute('min', minDate);
+            }
+
+            if (expirationInput && dateOpenBtn) {
+                dateOpenBtn.addEventListener('click', () => {
+                    if (typeof expirationInput.showPicker === 'function') {
+                        expirationInput.showPicker();
+                    } else {
+                        expirationInput.focus();
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

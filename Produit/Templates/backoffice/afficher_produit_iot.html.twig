@@ -1,0 +1,136 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}AGRINOVA | BackOffice Produits IOT{% endblock %}
+
+{% block bo_content %}
+<section class="bo-section">
+    <div class="bo-title-row">
+        <div>
+            <h1 class="bo-title">Produits IOT</h1>
+            <p class="bo-muted">Gestion des capteurs, passerelles et modules connectes.</p>
+        </div>
+        <div class="bo-actions">
+            <a class="bo-btn bo-btn-ghost" href="{{ path('produit_iot_list') }}">Vue 3D</a>
+            <a class="bo-btn" href="{{ path('produit_iot_afficher') }}">Vue catalogue</a>
+            <a class="bo-btn" href="{{ path('backoffice_produit_iot_ajouter') }}">Ajouter</a>
+        </div>
+    </div>
+
+    <div class="bo-grid">
+        <div class="bo-card">
+            <div class="bo-card-label">Total Produits</div>
+            <div class="bo-card-value">{{ produits|length }}</div>
+            <div class="bo-card-hint">Tous les IOT en stock.</div>
+        </div>
+        <div class="bo-card">
+            <div class="bo-card-label">Stocks Faibles</div>
+            <div class="bo-card-value">
+                {{ produits|filter(p => p.quantite is not null and p.quantite < 5)|length }}
+            </div>
+            <div class="bo-card-hint">Alerte sous 5 unites.</div>
+        </div>
+        <div class="bo-card">
+            <div class="bo-card-label">Sans Prix</div>
+            <div class="bo-card-value">
+                {{ produits|filter(p => p.prix is null)|length }}
+            </div>
+            <div class="bo-card-hint">Produits a completer.</div>
+        </div>
+        <div class="bo-card">
+            <div class="bo-card-label">Categories</div>
+            <div class="bo-card-value">{{ categorie_count }}</div>
+            <div class="bo-card-hint">Segments IOT actifs.</div>
+        </div>
+    </div>
+
+    <div class="bo-panel">
+        <div class="bo-panel-header">
+            <div>
+                <h2>Liste des produits</h2>
+                <p class="bo-muted">Recherchez un produit, sa reference ou sa categorie.</p>
+            </div>
+            <div class="bo-panel-actions">
+                <input id="bo-iot-search" class="bo-input" type="search" placeholder="Ex: capteur, ref..." />
+            </div>
+        </div>
+
+        <div class="bo-table">
+            <table class="bo-data-table">
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th>Reference</th>
+                        <th>Categorie</th>
+                        <th>Stock</th>
+                        <th>Prix</th>
+                        <th>Etat</th>
+                    </tr>
+                </thead>
+                <tbody id="bo-iot-table">
+                    {% for produit in produits %}
+                        <tr class="bo-table-row" data-search="{{ (produit.nom ~ ' ' ~ produit.ref ~ ' ' ~ (produit.categorie ?? '') ~ ' ' ~ (produit.description ?? ''))|lower }}">
+                            <td>
+                                <div class="bo-table-product">
+                                    <div class="bo-table-thumb">
+                                        {% if produit.image is not null %}
+                                            <img src="{{ path('produit_iot_image', {'id': produit.id}) }}" alt="{{ produit.nom }}">
+                                        {% else %}
+                                            <span class="bo-thumb-placeholder">N/A</span>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <div class="bo-table-name">{{ produit.nom }}</div>
+                                        <div class="bo-table-desc">{{ produit.description ?? 'Aucune description.' }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="bo-table-ref">{{ produit.ref }}</td>
+                            <td><span class="bo-tag">{{ produit.categorie ?? 'IOT' }}</span></td>
+                            <td class="bo-table-stock">{{ produit.quantite is not null ? produit.quantite : '-' }}</td>
+                            <td class="bo-table-price">
+                                {% if produit.prix is not null %}
+                                    {{ produit.prix }} DT
+                                {% else %}
+                                    Prix indisponible
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if produit.quantite is not null and produit.quantite > 10 %}
+                                    <span class="bo-status good">OK</span>
+                                {% elseif produit.quantite is not null and produit.quantite > 0 %}
+                                    <span class="bo-status warn">Faible</span>
+                                {% else %}
+                                    <span class="bo-status danger">Rupture</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td class="bo-empty" colspan="6">Aucun produit IOT trouve.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const search = document.getElementById('bo-iot-search');
+            const rows = document.querySelectorAll('#bo-iot-table .bo-table-row');
+            if (!search) return;
+
+            search.addEventListener('input', () => {
+                const value = search.value.trim().toLowerCase();
+                rows.forEach((row) => {
+                    const haystack = row.dataset.search || '';
+                    row.style.display = haystack.includes(value) ? '' : 'none';
+                });
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Details produit{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <h1 class="h3 mb-3">Details produit</h1>
+
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>ID</th>
+                <td>{{ produit.id }}</td>
+            </tr>
+            <tr>
+                <th>Reference</th>
+                <td>{{ produit.ref }}</td>
+            </tr>
+            <tr>
+                <th>Nom</th>
+                <td>{{ produit.nom }}</td>
+            </tr>
+            <tr>
+                <th>Prix</th>
+                <td>{{ produit.prix }}</td>
+            </tr>
+            <tr>
+                <th>Quantite</th>
+                <td>{{ produit.quantite }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ produit.description ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th>Image</th>
+                <td>{{ produit.image ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th>Likes</th>
+                <td>{{ produit.nbrLike }}</td>
+            </tr>
+            <tr>
+                <th>Date ajout</th>
+                <td>{{ produit.dateAjout ? produit.dateAjout|date('Y-m-d H:i') : '-' }}</td>
+            </tr>
+            <tr>
+                <th>Proprietaire (ID)</th>
+                <td>{{ produit.proprietaire ?? '-' }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ produit.typeLabel }}</td>
+            </tr>
+
+            {% if produit.typeLabel == 'Agricole' %}
+                <tr>
+                    <th>Categorie agricole</th>
+                    <td>{{ produit.categorieAgricole ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th>Date d'expiration</th>
+                    <td>{{ produit.dateExpiration ? produit.dateExpiration|date('Y-m-d') : '-' }}</td>
+                </tr>
+            {% endif %}
+
+            {% if produit.typeLabel == 'IOT' %}
+                <tr>
+                    <th>Categorie</th>
+                    <td>{{ produit.categorie ?? '-' }}</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-primary" href="{{ path('produit_edit', {'id': produit.id}) }}">Modifier</a>
+        <a class="btn btn-link" href="{{ path('produit_index') }}">Retour a la liste</a>
+    </div>
+</div>
+{% endblock %}

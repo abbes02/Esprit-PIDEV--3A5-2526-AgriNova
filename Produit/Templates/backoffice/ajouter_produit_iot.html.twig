@@ -1,0 +1,83 @@
+{% extends 'backoffice/base.html.twig' %}
+
+{% block title %}AGRINOVA | BackOffice Ajouter Produit IOT{% endblock %}
+
+{% block bo_content %}
+<section class="bo-section">
+    <div class="bo-title-row">
+        <div>
+            <h1 class="bo-title">Ajouter un produit IOT</h1>
+            <p class="bo-muted">Enregistrez un nouveau capteur ou module connecte.</p>
+        </div>
+        <div class="bo-actions">
+            <a class="bo-btn bo-btn-ghost" href="{{ path('backoffice_produit_iot_afficher') }}">Retour liste</a>
+        </div>
+    </div>
+
+    <div class="bo-form-shell">
+        <aside class="bo-form-panel">
+            <h2>Directives</h2>
+            <p class="bo-form-hint">
+                Gardez des references uniques et une description claire pour faciliter le suivi.
+            </p>
+            <div class="bo-divider"></div>
+            <div class="bo-upload">
+                <strong>Visuel produit</strong>
+                <small>Utilisez un chemin local ou un lien partage.</small>
+            </div>
+            <div class="bo-divider"></div>
+            <p class="bo-form-hint">
+                Champs recommandes :
+                <br />Reference, nom, categorie, stock, prix.
+            </p>
+        </aside>
+
+        <div class="bo-panel">
+            {{ form_start(form, {'attr': {'class': 'bo-form'}}) }}
+                <div class="bo-grid-2">
+                    <div class="bo-field">
+                        <label class="bo-label" for="produit_iot_ref">Reference</label>
+                        {{ form_widget(form.ref, {'attr': {'class': 'bo-input', 'placeholder': 'REF-IOT-001'}}) }}
+                    </div>
+                    <div class="bo-field">
+                        <label class="bo-label" for="produit_iot_nom">Nom</label>
+                        {{ form_widget(form.nom, {'attr': {'class': 'bo-input', 'placeholder': 'Capteur Humidite X'}}) }}
+                    </div>
+                </div>
+
+                <div class="bo-grid-2">
+                    <div class="bo-field">
+                        <label class="bo-label" for="produit_iot_categorie">Categorie</label>
+                        {{ form_widget(form.categorie, {'attr': {'class': 'bo-select'}}) }}
+                    </div>
+                    <div class="bo-field">
+                        <label class="bo-label" for="produit_iot_quantite">Stock initial</label>
+                        {{ form_widget(form.quantite, {'attr': {'class': 'bo-input', 'placeholder': 'Quantite'}}) }}
+                    </div>
+                </div>
+
+                <div class="bo-grid-2">
+                    <div class="bo-field">
+                        <label class="bo-label" for="produit_iot_prix">Prix (TND)</label>
+                        {{ form_widget(form.prix, {'attr': {'class': 'bo-input', 'placeholder': '0.00'}}) }}
+                    </div>
+                    <div class="bo-field">
+                        <label class="bo-label" for="produit_iot_image">Image</label>
+                        {{ form_widget(form.image, {'attr': {'class': 'bo-input', 'placeholder': 'C:\\Images\\iot.jpg'}}) }}
+                    </div>
+                </div>
+
+                <div class="bo-field">
+                    <label class="bo-label" for="produit_iot_description">Description</label>
+                    {{ form_widget(form.description, {'attr': {'class': 'bo-textarea', 'placeholder': 'Notes techniques, compatibilites...'}}) }}
+                </div>
+
+                <div class="bo-form-actions">
+                    <button class="bo-btn" type="submit">Ajouter le produit</button>
+                    <a class="bo-btn bo-btn-outline" href="{{ path('backoffice_produit_iot_afficher') }}">Annuler</a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</section>
+{% endblock %}

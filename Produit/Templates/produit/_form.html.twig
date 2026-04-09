@@ -1,0 +1,15 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+{% for field in form %}
+    {% if field.vars.name not in ['submit', '_token'] %}
+        <div class="mb-3">
+            {{ form_label(field, null, {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(field) }}
+            {{ form_errors(field) }}
+        </div>
+    {% endif %}
+{% endfor %}
+
+{{ form_widget(form.submit) }}
+
+{{ form_end(form) }}

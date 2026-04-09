@@ -1,0 +1,104 @@
+{% set selectedUserId = (current_user is defined and current_user) ? current_user.id : app.request.query.get('user_id') %}
+{% set previewImagePath = form.vars.value and attribute(form.vars.value, 'imageUrl') ? attribute(form.vars.value, 'imageUrl') : '' %}
+{% set previewImageSrc = previewImagePath %}
+{% if previewImagePath and (previewImagePath starts with('http://') == false) and (previewImagePath starts with('https://') == false) and (previewImagePath starts with('//') == false) %}
+    {% set previewImageSrc = previewImagePath starts with('/') ? previewImagePath : '/' ~ previewImagePath %}
+{% endif %}
+{% set fallbackImage = '/ecova/images/h2-slide1.jpg' %}
+
+{{ form_start(form, {'attr': {'class': 'agri-form-shell materiel-form'}, 'multipart': true}) }}
+    {% if form.vars.errors|length > 0 %}
+        <div class="alert alert-danger mb-3">
+            {{ form_errors(form) }}
+        </div>
+    {% endif %}
+
+    {% if previewImageSrc %}
+        <div class="material-form-preview">
+            <div class="preview-header">
+                <i class="fas fa-image"></i>
+                <span>Image actuelle</span>
+            </div>
+            <img class="materiel-thumb-lg" src="{{ previewImageSrc }}" alt="Image du matériel" onerror="this.onerror=null;this.src='{{ fallbackImage }}';">
+            <p class="preview-hint"><i class="fas fa-info-circle"></i> Téléchargez une nouvelle image pour remplacer celle-ci.</p>
+        </div>
+    {% endif %}
+
+    <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-info-circle"></i> Informations de base</h3>
+        <div class="agri-form-grid">
+            <div class="form-col-6">
+                {{ form_label(form.nom, null, {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(form.nom) }}
+                <div class="field-errors">{{ form_errors(form.nom) }}</div>
+            </div>
+
+            <div class="form-col-6">
+                {{ form_label(form.type, null, {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(form.type) }}
+                <div class="field-errors">{{ form_errors(form.type) }}</div>
+                <p class="muted field-help">Catégorie principale du matériel</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-tag"></i> Tarification</h3>
+        <div class="agri-form-grid">
+            <div class="form-col-6">
+                {{ form_label(form.prixLocation, null, {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(form.prixLocation) }}
+                <div class="field-errors">{{ form_errors(form.prixLocation) }}</div>
+                <p class="muted field-help">Prix journalier de location</p>
+            </div>
+
+            <div class="form-col-6">
+                <div class="pricing-tip-box">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>Conseil tarification</strong>
+                        <p>Consultez les prix similaires sur le marketplace pour rester compétitif.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-camera"></i> Photo du matériel</h3>
+        <div class="agri-form-grid">
+            <div class="form-col-12">
+                {{ form_label(form.imageFile, null, {'label_attr': {'class': 'field-label'}}) }}
+                <div class="image-upload-wrapper">
+                    {{ form_widget(form.imageFile) }}
+                    <div class="upload-hint">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Glissez une image ou cliquez pour sélectionner</span>
+                    </div>
+                </div>
+                <div class="field-errors">{{ form_errors(form.imageFile) }}</div>
+                <p class="muted field-help">Formats acceptés: JPG, PNG, GIF, WEBP. Une bonne photo augmente vos chances de location!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-align-left"></i> Description détaillée</h3>
+        <div class="agri-form-grid">
+            <div class="form-col-12">
+                {{ form_label(form.description, null, {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(form.description) }}
+                <div class="field-errors">{{ form_errors(form.description) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions form-actions">
+        <button class="button">
+            <i class="fas fa-save"></i> {{ button_label|default('Publier l\'annonce') }}
+        </button>
+        <a class="button secondary" href="{{ path('app_materiel_index', selectedUserId ? {'user_id': selectedUserId} : {}) }}">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+{{ form_end(form) }}

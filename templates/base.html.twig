@@ -5,14 +5,133 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}AgriNova{% endblock %}</title>
         <meta name="description" content="{% block meta_description %}Interface AgriNova.{% endblock %}">
+        <link rel="icon" type="image/png" href="/logo.png">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="/styles/login.css">
+        {% set routeName = app.request.attributes.get('_route')|default('') %}
+        {% set inMaterialsWorkspace = routeName starts with 'app_materiel_' or routeName starts with 'app_location_' or routeName starts with 'app_panne_' %}
+        {% if inMaterialsWorkspace %}
+            <link href="/ecova/css/custom.css" rel="stylesheet">
+            <link href="/ecova/css/color.css" rel="stylesheet">
+            <link href="/ecova/css/responsive.css" rel="stylesheet">
+            <link href="/ecova/css/owl.carousel.min.css" rel="stylesheet">
+            <link href="/ecova/css/bootstrap.min.css" rel="stylesheet">
+            <link href="/ecova/css/prettyPhoto.css" rel="stylesheet">
+            <link href="/ecova/css/all.min.css" rel="stylesheet">
+            <style>
+                body.materials-shell {
+                    background: linear-gradient(160deg, #eaf4ec 0%, #edf6fb 48%, #f7faf9 100%);
+                    color: #172126;
+                }
+
+                .materials-shell .app-shell {
+                    max-width: 1400px;
+                    margin: 0 auto;
+                    padding: 32px 24px 48px;
+                }
+
+                .materials-shell .materials-topbar {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 16px;
+                    margin-bottom: 24px;
+                    padding: 18px 22px;
+                    border-radius: 20px;
+                    background: rgba(10, 60, 34, 0.92);
+                    color: #f1fff5;
+                    box-shadow: 0 16px 48px rgba(8, 40, 21, 0.18);
+                }
+
+                .materials-shell .materials-brand {
+                    color: inherit;
+                    font-size: 1.35rem;
+                    font-weight: 800;
+                    letter-spacing: 0.08em;
+                    text-decoration: none;
+                }
+
+                .materials-shell .materials-nav {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                }
+
+                .materials-shell .materials-nav a {
+                    color: rgba(241, 255, 245, 0.88);
+                    text-decoration: none;
+                    padding: 8px 14px;
+                    border-radius: 999px;
+                    font-weight: 600;
+                    background: rgba(255, 255, 255, 0.08);
+                }
+
+                .materials-shell .materials-nav a.is-active,
+                .materials-shell .materials-nav a:hover {
+                    color: #fff;
+                    background: rgba(255, 255, 255, 0.18);
+                }
+
+                .materials-shell .materials-user {
+                    font-size: 0.95rem;
+                    font-weight: 500;
+                    opacity: 0.92;
+                }
+
+                .materials-shell .flash-stack {
+                    margin-bottom: 18px;
+                }
+
+                .materials-shell .flash-stack .alert {
+                    margin-bottom: 10px;
+                }
+            </style>
+        {% endif %}
         {% block stylesheets %}{% endblock %}
-        {% block javascripts %}{% endblock %}
     </head>
-    <body>
-        {% block body %}{% endblock %}
+    <body class="{{ inMaterialsWorkspace ? 'materials-shell' : '' }}">
+        {% set pageBody %}{% block body %}{% endblock %}{% endset %}
+        {% if inMaterialsWorkspace %}
+            {% set currentUser = current_user|default(null) %}
+            <div class="app-shell">
+                <header class="materials-topbar">
+                    <a class="materials-brand" href="{{ path('app_materiel_index') }}">AGRINOVA</a>
+                    <nav class="materials-nav" aria-label="Gestion materiel">
+                        <a href="{{ path('app_materiel_index') }}" class="{{ routeName starts with 'app_materiel_' ? 'is-active' : '' }}">Marketplace</a>
+                        <a href="{{ path('app_location_index') }}" class="{{ routeName starts with 'app_location_' ? 'is-active' : '' }}">Locations</a>
+                        <a href="{{ path('app_panne_index') }}" class="{{ routeName starts with 'app_panne_' ? 'is-active' : '' }}">Pannes</a>
+                    </nav>
+                    <div class="materials-user">
+                        {{ currentUser ? currentUser.displayName : (app.session.get('auth_user')['display_name'] ?? 'Utilisateur') }}
+                    </div>
+                </header>
+
+                <div class="flash-stack">
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label == 'error' ? 'danger' : label }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+
+                {{ pageBody }}
+            </div>
+        {% else %}
+            {{ pageBody }}
+        {% endif %}
+
+        {% if inMaterialsWorkspace %}
+            <script src="/ecova/js/jquery-3.3.1.min.js"></script>
+            <script src="/ecova/js/jquery-migrate-1.4.1.min.js"></script>
+            <script src="/ecova/js/popper.min.js"></script>
+            <script src="/ecova/js/bootstrap.min.js"></script>
+            <script src="/ecova/js/owl.carousel.min.js"></script>
+            <script src="/ecova/js/jquery.prettyPhoto.js"></script>
+            <script src="/ecova/js/isotope.min.js"></script>
+            <script type="module" src="/ecova/js/custom.js"></script>
+        {% endif %}
+        {% block javascripts %}{% endblock %}
     </body>
 </html>

@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Panne{% endblock %}
+
+{% block body %}
+    <section class="card">
+        <h1>Manage Panne #{{ panne.id }}</h1>
+        <p class="muted">Mettez a jour la description, ajoutez un diagnostic, puis renseignez la date de reparation une fois le probleme resolu.</p>
+        {% include 'panne/_form.html.twig' with {form: form, current_user: current_user, button_label: 'Update Incident'} %}
+    </section>
+{% endblock %}

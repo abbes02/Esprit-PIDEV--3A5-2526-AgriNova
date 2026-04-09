@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Location Details{% endblock %}
+
+{% block body %}
+    {% set statusClass = location.statut == 'Annulee' ? 'status-pill cancelled' : (location.statut == 'Terminee' ? 'status-pill done' : 'status-pill active') %}
+    {% set dayCount = (location.dateDebut and location.dateFin and location.dateFin >= location.dateDebut) ? (location.dateDebut.diff(location.dateFin).days + 1) : 0 %}
+    {% set dailyRate = (dayCount > 0 and location.montantTotal is not null) ? (location.montantTotal / dayCount) : null %}
+    {% set canReportPanne = location.materiel and (location.statut is empty or location.statut == 'En cours') %}
+
+    <section class="card">
+        <h1>Location #{{ location.id }}</h1>
+        <table>
+            <tbody>
+                <tr><th>Date debut</th><td>{{ location.dateDebut ? location.dateDebut|date('Y-m-d') : '-' }}</td></tr>
+                <tr><th>Date fin</th><td>{{ location.dateFin ? location.dateFin|date('Y-m-d') : '-' }}</td></tr>
+                <tr><th>Duree</th><td>{{ dayCount > 0 ? dayCount ~ ' day(s)' : '-' }}</td></tr>
+                <tr><th>Prix journalier</th><td>{{ dailyRate is not null ? dailyRate|number_format(2, '.', ' ') ~ ' TND/day' : '-' }}</td></tr>
+                <tr><th>Montant total</th><td>{{ location.montantTotal is not null ? location.montantTotal|number_format(2, '.', ' ') ~ ' TND' : '-' }}</td></tr>
+                <tr><th>Statut</th><td><span class="{{ statusClass }}">{{ location.statut ?: 'En cours' }}</span></td></tr>
+                <tr><th>Materiel</th><td>{{ location.materiel ? location.materiel.nom : '-' }}</td></tr>
+                <tr><th>Utilisateur</th><td>{{ location.utilisateur ? location.utilisateur.prenom ~ ' ' ~ location.utilisateur.nom : '-' }}</td></tr>
+            </tbody>
+        </table>
+
+        <div class="actions">
+            <a class="button secondary" href="{{ path('app_location_index', {'user_id': current_user.id}) }}">Back</a>
+            <a class="button" href="{{ path('app_location_edit', {'id': location.id, 'user_id': current_user.id}) }}">Edit</a>
+            {% if canReportPanne %}
+                <a class="button secondary" href="{{ path('app_panne_new', {'user_id': current_user.id, 'materiel_id': location.materiel.id}) }}">Report Panne</a>
+            {% endif %}
+            {% if location.statut != 'Annulee' %}
+                {% include 'location/_cancel_form.html.twig' %}
+            {% endif %}
+            {% include 'location/_delete_form.html.twig' %}
+        </div>
+    </section>
+{% endblock %}

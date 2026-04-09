@@ -1,0 +1,338 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Pannes{% endblock %}
+
+{% block body %}
+    <section class="card module-head">
+        <div>
+            <div class="module-title">
+                <span class="module-icon"><i class="fas fa-tools"></i></span>
+                <h1>Pannes & Incidents</h1>
+            </div>
+            <p class="module-sub">Signalez les pannes de vos matériels et ceux que vous louez actuellement</p>
+        </div>
+        <div class="actions">
+            <a class="button" href="{{ path('app_panne_new', {'user_id': current_user.id}) }}">
+                <i class="fas fa-plus"></i> Signaler une panne
+            </a>
+        </div>
+    </section>
+
+    <section class="kpi-grid kpi-grid-3">
+        <article class="kpi-card records">
+            <span class="kpi-icon"><i class="fas fa-list"></i></span>
+            <div class="kpi-content">
+                <span class="kpi-label">Total Pannes</span>
+                <p class="kpi-value">{{ stats.records }}</p>
+            </div>
+        </article>
+        <article class="kpi-card unresolved">
+            <span class="kpi-icon"><i class="fas fa-exclamation-circle"></i></span>
+            <div class="kpi-content">
+                <span class="kpi-label">Signalées</span>
+                <p class="kpi-value">{{ stats.unresolved_pannes }}</p>
+            </div>
+        </article>
+        <article class="kpi-card active">
+            <span class="kpi-icon"><i class="fas fa-calendar-check"></i></span>
+            <div class="kpi-content">
+                <span class="kpi-label">Locations Actives</span>
+                <p class="kpi-value">{{ stats.active_locations }}</p>
+            </div>
+        </article>
+    </section>
+
+    {% if pannes is empty %}
+        <section class="card empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <h2>Aucune panne signalée</h2>
+            <p class="muted">Tous vos matériels fonctionnent correctement. Si vous constatez un problème, signalez-le ici.</p>
+            <div class="actions">
+                <a class="button" href="{{ path('app_panne_new', {'user_id': current_user.id}) }}">
+                    <i class="fas fa-plus"></i> Signaler une panne
+                </a>
+            </div>
+        </section>
+    {% else %}
+        <div class="search-sort-bar" id="panne-toolbar">
+            <div class="search-input-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" class="search-input" id="panne-search" placeholder="Rechercher par matériel, description, type..." autocomplete="off">
+            </div>
+            <select class="sort-select" id="panne-sort">
+                <option value="date-desc">Plus récent</option>
+                <option value="date-asc">Plus ancien</option>
+                <option value="name-asc">Matériel A → Z</option>
+                <option value="name-desc">Matériel Z → A</option>
+                <option value="severity">Sévérité</option>
+            </select>
+            <select class="sort-select" id="panne-filter-severity">
+                <option value="">Toutes les sévérités</option>
+                <option value="critical">Critique</option>
+                <option value="major">Majeur</option>
+                <option value="minor">Mineur</option>
+            </select>
+            <span class="search-count" id="panne-count"><strong>{{ pannes|length }}</strong> panne(s)</span>
+            <button type="button" class="button secondary small" id="panne-export-pdf" title="Exporter en PDF">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
+        </div>
+
+        <section class="panne-grid" id="panne-grid">
+            {% for panne in pannes %}
+                {% set severityClass = panne.severity ?? 'minor' %}
+                {% set panneTypeLabel = panne.panneTypeLabel ?? 'Autre' %}
+                
+                <article class="panne-card severity-{{ severityClass }}"
+                    data-name="{{ panne.materiel ? panne.materiel.nom|lower : '' }}"
+                    data-description="{{ panne.descriptionPanne|lower }}"
+                    data-type="{{ panneTypeLabel|lower }}"
+                    data-date="{{ panne.datePanne ? panne.datePanne|date('Y-m-d') : '1970-01-01' }}"
+                    data-severity="{{ severityClass }}"
+                >
+                    <div class="panne-card-header">
+                        <div class="panne-status-badges">
+                            <span class="severity-badge {{ severityClass }}">
+                                {% if severityClass == 'critical' %}
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                {% elseif severityClass == 'major' %}
+                                    <i class="fas fa-exclamation-circle"></i>
+                                {% else %}
+                                    <i class="fas fa-info-circle"></i>
+                                {% endif %}
+                                {{ panne.severityLabel ?? 'Mineur' }}
+                            </span>
+                        </div>
+                        <span class="panne-id">#{{ panne.id }}</span>
+                    </div>
+
+                    <div class="panne-card-body">
+                        <div class="panne-type-row">
+                            <span class="panne-type-badge">
+                                <i class="fas fa-tag"></i> {{ panneTypeLabel }}
+                            </span>
+                        </div>
+
+                        {% if panne.materiel %}
+                            <div class="panne-materiel-info">
+                                <i class="fas {{ panne.materiel.typeIcon ?? 'fa-box' }}"></i>
+                                <div>
+                                    <strong>{{ panne.materiel.nom }}</strong>
+                                    <span class="panne-owner">{{ panne.materiel.proprietaire ? (panne.materiel.proprietaire.prenom ~ ' ' ~ panne.materiel.proprietaire.nom)|trim : 'Propriétaire N/A' }}</span>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <p class="panne-description">
+                            {{ panne.descriptionPanne|length > 120 ? panne.descriptionPanne|slice(0, 117) ~ '...' : panne.descriptionPanne }}
+                        </p>
+
+                        <div class="panne-dates">
+                            <div class="panne-date">
+                                <i class="fas fa-calendar-times"></i>
+                                <span>Signalé: <strong>{{ panne.datePanne ? panne.datePanne|date('d/m/Y') : '-' }}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panne-card-actions">
+                        <a class="button secondary small" href="{{ path('app_panne_show', {'id': panne.id, 'user_id': current_user.id}) }}">
+                            <i class="fas fa-eye"></i> Voir
+                        </a>
+                        {% include 'panne/_delete_form.html.twig' %}
+                    </div>
+                </article>
+            {% endfor %}
+        </section>
+    {% endif %}
+
+    {# Panne data for PDF export #}
+    {% if pannes is not empty %}
+    <script>
+    window.__PANNE_DATA__ = [
+        {% for panne in pannes %}
+        {
+            "id": {{ panne.id }},
+            "materiel": {{ (panne.materiel ? panne.materiel.nom : 'N/A')|json_encode|raw }},
+            "description": {{ panne.descriptionPanne|json_encode|raw }},
+            "datePanne": {{ (panne.datePanne ? panne.datePanne|date('d/m/Y') : '-')|json_encode|raw }},
+            "dateReparation": {{ (panne.dateReparation ? panne.dateReparation|date('d/m/Y') : '-')|json_encode|raw }},
+            "severity": {{ (panne.severityLabel ?? 'Mineur')|json_encode|raw }},
+            "severityKey": {{ (panne.severity ?? 'minor')|json_encode|raw }},
+            "type": {{ (panne.panneTypeLabel ?? 'Autre')|json_encode|raw }},
+            "coutReparation": {{ panne.coutReparation ?? 0 }},
+            "status": {{ (panne.dateReparation ? 'Résolu' : 'Ouvert')|json_encode|raw }},
+            "reportedBy": {{ (panne.reportedByName ?? '-')|json_encode|raw }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+    </script>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+    <script>
+    (function() {
+        var grid = document.getElementById('panne-grid');
+        var searchInput = document.getElementById('panne-search');
+        var sortSelect = document.getElementById('panne-sort');
+        var filterSeverity = document.getElementById('panne-filter-severity');
+        var countEl = document.getElementById('panne-count');
+        if (!grid || !searchInput) return;
+
+        function applyFilters() {
+            var query = searchInput.value.toLowerCase().trim();
+            var severity = filterSeverity ? filterSeverity.value : '';
+            var cards = Array.from(grid.querySelectorAll('.panne-card'));
+            var visible = 0;
+
+            cards.forEach(function(card) {
+                var name = card.getAttribute('data-name') || '';
+                var desc = card.getAttribute('data-description') || '';
+                var type = card.getAttribute('data-type') || '';
+                var cardSeverity = card.getAttribute('data-severity') || '';
+                var matchSearch = !query || name.indexOf(query) !== -1 || desc.indexOf(query) !== -1 || type.indexOf(query) !== -1;
+                var matchSeverity = !severity || cardSeverity === severity;
+                if (matchSearch && matchSeverity) {
+                    card.style.display = '';
+                    visible++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (countEl) countEl.innerHTML = '<strong>' + visible + '</strong> panne(s)';
+        }
+
+        function applySort() {
+            var val = sortSelect ? sortSelect.value : 'date-desc';
+            var cards = Array.from(grid.querySelectorAll('.panne-card'));
+            var severityOrder = { critical: 0, major: 1, minor: 2 };
+
+            cards.sort(function(a, b) {
+                switch (val) {
+                    case 'name-asc': return (a.getAttribute('data-name') || '').localeCompare(b.getAttribute('data-name') || '');
+                    case 'name-desc': return (b.getAttribute('data-name') || '').localeCompare(a.getAttribute('data-name') || '');
+                    case 'date-desc': return (b.getAttribute('data-date') || '').localeCompare(a.getAttribute('data-date') || '');
+                    case 'date-asc': return (a.getAttribute('data-date') || '').localeCompare(b.getAttribute('data-date') || '');
+                    case 'severity': return (severityOrder[a.getAttribute('data-severity')] || 0) - (severityOrder[b.getAttribute('data-severity')] || 0);
+                    default: return 0;
+                }
+            });
+
+            cards.forEach(function(card) { grid.appendChild(card); });
+            applyFilters();
+        }
+
+        searchInput.addEventListener('input', applyFilters);
+        if (filterSeverity) filterSeverity.addEventListener('change', applyFilters);
+        if (sortSelect) sortSelect.addEventListener('change', applySort);
+
+        /* ===== PDF Export ===== */
+        var exportBtn = document.getElementById('panne-export-pdf');
+        if (exportBtn && window.jspdf && window.__PANNE_DATA__) {
+            exportBtn.addEventListener('click', function() {
+                var jsPDF = window.jspdf.jsPDF;
+                var doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+                /* Collect visible panne IDs from the grid */
+                var visibleIds = {};
+                if (grid) {
+                    Array.from(grid.querySelectorAll('.panne-card')).forEach(function(card) {
+                        if (card.style.display !== 'none') {
+                            var idEl = card.querySelector('.panne-id');
+                            if (idEl) {
+                                var idNum = parseInt(idEl.textContent.replace('#', ''), 10);
+                                if (!isNaN(idNum)) visibleIds[idNum] = true;
+                            }
+                        }
+                    });
+                }
+
+                var data = window.__PANNE_DATA__.filter(function(p) {
+                    return Object.keys(visibleIds).length === 0 || visibleIds[p.id];
+                });
+
+                /* Title */
+                doc.setFontSize(18);
+                doc.setTextColor(43, 75, 57);
+                doc.text('Rapport des Pannes - Agrinova', 14, 18);
+
+                doc.setFontSize(10);
+                doc.setTextColor(100);
+                var today = new Date();
+                doc.text('Export\u00e9 le ' + today.toLocaleDateString('fr-FR') + ' \u00e0 ' + today.toLocaleTimeString('fr-FR'), 14, 25);
+                doc.text(data.length + ' panne(s) export\u00e9e(s)', 14, 30);
+
+                /* Table */
+                var headers = [['#', 'Mat\u00e9riel', 'Type', 'S\u00e9v\u00e9rit\u00e9', 'Date', 'R\u00e9paration', 'Co\u00fbt (TND)', 'Statut', 'Description']];
+                var rows = data.map(function(p) {
+                    return [
+                        p.id,
+                        p.materiel,
+                        p.type,
+                        p.severity,
+                        p.datePanne,
+                        p.dateReparation,
+                        p.coutReparation > 0 ? p.coutReparation.toFixed(2) : '-',
+                        p.status,
+                        p.description.length > 60 ? p.description.substring(0, 57) + '...' : p.description
+                    ];
+                });
+
+                doc.autoTable({
+                    head: headers,
+                    body: rows,
+                    startY: 35,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [29, 122, 67],
+                        textColor: 255,
+                        fontStyle: 'bold',
+                        fontSize: 8
+                    },
+                    bodyStyles: { fontSize: 7.5 },
+                    columnStyles: {
+                        0: { cellWidth: 12, halign: 'center' },
+                        3: { cellWidth: 20 },
+                        4: { cellWidth: 22 },
+                        5: { cellWidth: 22 },
+                        6: { cellWidth: 20, halign: 'right' },
+                        7: { cellWidth: 18, halign: 'center' },
+                        8: { cellWidth: 'auto' }
+                    },
+                    alternateRowStyles: { fillColor: [240, 250, 243] },
+                    margin: { left: 14, right: 14 },
+                    didParseCell: function(hookData) {
+                        if (hookData.section === 'body' && hookData.column.index === 3) {
+                            var val = (hookData.cell.raw || '').toString().toLowerCase();
+                            if (val.indexOf('critique') !== -1) {
+                                hookData.cell.styles.textColor = [180, 30, 30];
+                                hookData.cell.styles.fontStyle = 'bold';
+                            } else if (val.indexOf('majeur') !== -1) {
+                                hookData.cell.styles.textColor = [200, 120, 0];
+                                hookData.cell.styles.fontStyle = 'bold';
+                            }
+                        }
+                        if (hookData.section === 'body' && hookData.column.index === 7) {
+                            var st = (hookData.cell.raw || '').toString();
+                            if (st === 'Ouvert') {
+                                hookData.cell.styles.textColor = [180, 30, 30];
+                            } else {
+                                hookData.cell.styles.textColor = [29, 122, 67];
+                            }
+                        }
+                    }
+                });
+
+                doc.save('pannes-agrinova-' + today.toISOString().slice(0, 10) + '.pdf');
+            });
+        }
+    })();
+    </script>
+{% endblock %}

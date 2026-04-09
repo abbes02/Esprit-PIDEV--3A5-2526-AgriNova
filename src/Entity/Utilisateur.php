@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UtilisateurRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -99,7 +101,26 @@ class Utilisateur
     #[ORM\Column(name: 'date_creation', nullable: true)]
     private ?\DateTimeImmutable $dateCreation = null;
 
+    /** @var Collection<int, Materiel> */
+    #[ORM\OneToMany(mappedBy: 'proprietaire', targetEntity: Materiel::class)]
+    private Collection $materiels;
+
+    /** @var Collection<int, Location> */
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Location::class)]
+    private Collection $locations;
+
+    public function __construct()
+    {
+        $this->materiels = new ArrayCollection();
+        $this->locations = new ArrayCollection();
+    }
+
     public function getIdUtilisateur(): ?int
+    {
+        return $this->idUtilisateur;
+    }
+
+    public function getId(): ?int
     {
         return $this->idUtilisateur;
     }
@@ -239,5 +260,57 @@ class Utilisateur
     public function getDisplayName(): string
     {
         return trim((string) $this->prenom . ' ' . (string) $this->nom);
+    }
+
+    /**
+     * @return Collection<int, Materiel>
+     */
+    public function getMateriels(): Collection
+    {
+        return $this->materiels;
+    }
+
+    public function addMateriel(Materiel $materiel): static
+    {
+        if (!$this->materiels->contains($materiel)) {
+            $this->materiels->add($materiel);
+            $materiel->setProprietaire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMateriel(Materiel $materiel): static
+    {
+        if ($this->materiels->removeElement($materiel) && $materiel->getProprietaire() === $this) {
+            $materiel->setProprietaire(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Location>
+     */
+    public function getLocations(): Collection
+    {
+        return $this->locations;
+    }
+
+    public function addLocation(Location $location): static
+    {
+        if (!$this->locations->contains($location)) {
+            $this->locations->add($location);
+            $location->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLocation(Location $location): static
+    {
+        $this->locations->removeElement($location);
+
+        return $this;
     }
 }

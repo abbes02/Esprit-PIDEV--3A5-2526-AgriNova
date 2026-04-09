@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Materiel{% endblock %}
+
+{% block body %}
+    <section class="card">
+        <h1>Edit Materiel #{{ materiel.id }}</h1>
+        {% include 'materiel/_form.html.twig' with {form: form, current_user: current_user, button_label: 'Update'} %}
+    </section>
+{% endblock %}

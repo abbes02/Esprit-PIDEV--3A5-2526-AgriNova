@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Location{% endblock %}
+
+{% block body %}
+    {% set fallbackImage = '/ecova/images/h2-slide1.jpg' %}
+
+    {% if selected_materiel is defined and selected_materiel %}
+        {% set selectedImagePath = selected_materiel.imageUrl ?: '' %}
+        {% set selectedImageSrc = selectedImagePath %}
+        {% if selectedImagePath and (selectedImagePath starts with('http://') == false) and (selectedImagePath starts with('https://') == false) and (selectedImagePath starts with('//') == false) %}
+            {% set selectedImageSrc = selectedImagePath starts with('/') ? selectedImagePath : '/' ~ selectedImagePath %}
+        {% endif %}
+
+        <section class="card market-rental-focus">
+            <h2>Selected from marketplace</h2>
+            <div class="market-rental-focus-body">
+                <img class="materiel-thumb-lg" src="{{ selectedImageSrc ?: fallbackImage }}" alt="{{ selected_materiel.nom }}" onerror="this.onerror=null;this.src='{{ fallbackImage }}';">
+                <div>
+                    <h3>{{ selected_materiel.nom }}</h3>
+                    <p class="muted">{{ selected_materiel.type }} | Status: {{ selected_materiel.etat }}</p>
+                    <p class="market-price-line">{{ selected_materiel.prixLocation|number_format(2, '.', ' ') }} TND / day</p>
+                    <p class="muted">Complete the form below to confirm the rental.</p>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="card">
+        <h1>Create Location</h1>
+        <p class="muted">Status is automatic: En cours, Terminee, or Annulee (via Cancel action). Overlapping reservations for the same material are blocked automatically.</p>
+        {% include 'location/_form.html.twig' with {form: form, current_user: current_user, button_label: 'Create', lock_materiel: lock_materiel|default(false)} %}
+    </section>
+{% endblock %}

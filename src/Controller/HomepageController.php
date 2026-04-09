@@ -99,5 +99,3 @@ class HomepageController extends AbstractController
         return $utilisateurRepository->find($userId);
     }
 }
-
-

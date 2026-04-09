@@ -1,7 +1,7 @@
 <header class="topbar glass parallax" data-speed="0.12">
     <div>
         <p class="eyebrow">
-            <a href="{% if (app.session.get('auth_user')['role'] ?? '')|upper == 'ADMIN' %}{{ path('app_admin_users') }}{% else %}{{ path('app_dashboard') }}{% endif %}">AgriNova</a>
+            <a href="{% if (app.session.get('auth_user')['role'] ?? '')|upper == 'ADMIN' %}{{ path('app_admin_users') }}{% else %}{{ path('app_backoffice') }}{% endif %}">AgriNova</a>
         </p>
         <h1 class="reveal-text">{{ title }}</h1>
     </div>

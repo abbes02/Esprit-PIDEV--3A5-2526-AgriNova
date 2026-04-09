@@ -4,6 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{% block title %}Agrinova{% endblock %}</title>
+        <link rel="icon" type="image/png" href="/logo.png">
         {% block stylesheets %}
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -317,13 +318,15 @@
                 .brand-mark {
                     width: 2.5rem;
                     height: 2.5rem;
-                    display: block;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
                 }
 
                 .brand-mark img {
                     width: 100%;
                     height: 100%;
-                    object-fit: cover;
+                    object-fit: contain;
                     display: block;
                 }
 
@@ -937,8 +940,8 @@
         <div class="app-shell">
             <div class="app-layout">
                 <aside class="site-sidebar">
-                    <a class="sidebar-brand" href="{% if (app.session.get('auth_user')['role'] ?? '')|upper == 'ADMIN' %}{{ path('app_admin_users') }}{% else %}{{ path('app_parcelle_index') }}{% endif %}">
-                        <span class="brand-mark"></span>
+                    <a class="sidebar-brand" href="{% if (app.session.get('auth_user')['role'] ?? '')|upper == 'ADMIN' %}{{ path('app_admin_users') }}{% else %}{{ path('app_backoffice') }}{% endif %}">
+                        <span class="brand-mark"><img src="/logo.png" alt="Agrinova logo"></span>
                         <span>Agrinova</span>
                     </a>
                     <div class="sidebar-nav">
@@ -953,8 +956,8 @@
                 <div class="header-shell">
                     <nav class="site-nav">
                         <div class="nav-main">
-                            <a class="brand" href="{% if (app.session.get('auth_user')['role'] ?? '')|upper == 'ADMIN' %}{{ path('app_admin_users') }}{% else %}{{ path('app_parcelle_index') }}{% endif %}">
-                                <span class="brand-mark"></span>
+                            <a class="brand" href="{% if (app.session.get('auth_user')['role'] ?? '')|upper == 'ADMIN' %}{{ path('app_admin_users') }}{% else %}{{ path('app_backoffice') }}{% endif %}">
+                                <span class="brand-mark"><img src="/logo.png" alt="Agrinova logo"></span>
                                 <span>Agrinova</span>
                             </a>
                         </div>

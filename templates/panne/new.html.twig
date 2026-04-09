@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Panne{% endblock %}
+
+{% block body %}
+    {% if selected_materiel is defined and selected_materiel %}
+        <section class="card market-rental-focus">
+            <h2>Signalement depuis location</h2>
+            <div class="market-rental-focus-body">
+                <div>
+                    <h3>{{ selected_materiel.nom }}</h3>
+                    <p class="muted">{{ selected_materiel.type }} | Etat actuel: {{ selected_materiel.etat ?: 'N/A' }}</p>
+                    <p class="muted">Decrivez simplement la panne observee, le materiel est deja selectionne.</p>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="card">
+        <h1>Report Panne</h1>
+        <p class="muted">Workflow simplifie: selectionnez le materiel puis decrivez la panne. Les informations de cout et de date de panne sont gerees automatiquement.</p>
+        {% include 'panne/_form.html.twig' with {form: form, current_user: current_user, button_label: 'Report', lock_materiel: lock_materiel|default(false)} %}
+    </section>
+{% endblock %}

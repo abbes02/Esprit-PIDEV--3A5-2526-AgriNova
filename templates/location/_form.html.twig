@@ -1,0 +1,297 @@
+{% set selectedUserId = (current_user is defined and current_user) ? current_user.id : app.request.query.get('user_id') %}
+{% set isLockedMateriel = lock_materiel|default(false) %}
+
+{{ form_start(form, {'attr': {'class': 'agri-form-shell location-form'}}) }}
+    {{ form_widget(form.montantTotal) }}
+
+    {% if form.vars.errors|length > 0 %}
+        <div class="alert alert-danger mb-3">
+            {{ form_errors(form) }}
+        </div>
+    {% endif %}
+
+    {% if isLockedMateriel %}
+        <div class="location-lock-note">
+            <i class="fas fa-lock"></i>
+            <div>
+                <strong>Matériel présélectionné depuis le marketplace</strong>
+                <p><a href="{{ path('app_materiel_index', selectedUserId ? {'user_id': selectedUserId} : {}) }}">Retourner au marketplace</a> pour changer de matériel.</p>
+            </div>
+        </div>
+    {% endif %}
+
+    <section class="rental-total-panel js-rental-panel" aria-live="polite">
+        <div class="rental-panel-header">
+            <span class="rental-chip"><i class="fas fa-calculator"></i> Calcul automatique</span>
+        </div>
+        <div class="rental-panel-body">
+            <p class="rental-total-label">Montant total</p>
+            <p class="rental-total-value"><span data-rental-total-value>0.00</span> <small>TND</small></p>
+            <div class="rental-meta-row">
+                <span class="rental-meta-item">
+                    <i class="fas fa-calendar-day"></i>
+                    <strong data-rental-days>1</strong> jour(s)
+                </span>
+                <span class="rental-meta-item">
+                    <i class="fas fa-tag"></i>
+                    <strong data-rental-daily>0.00</strong> TND/jour
+                </span>
+            </div>
+        </div>
+        <div class="field-errors">{{ form_errors(form.montantTotal) }}</div>
+    </section>
+
+    <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-tractor"></i> Sélection du matériel</h3>
+        <div class="agri-form-grid">
+            <div class="form-col-12">
+                {{ form_label(form.materiel, null, {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(form.materiel) }}
+                <div class="field-errors">{{ form_errors(form.materiel) }}</div>
+                {% if isLockedMateriel %}
+                    <p class="muted field-help"><i class="fas fa-info-circle"></i> Ce champ est verrouillé pour protéger votre réservation.</p>
+                {% else %}
+                    <p class="muted field-help">Seuls les matériels disponibles sont affichés.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="booked-periods-box js-booked-periods" style="display: none;">
+            <div class="booked-periods-header">
+                <i class="fas fa-calendar-times"></i>
+                <strong>Périodes déjà réservées</strong>
+            </div>
+            <ul class="booked-periods-list" data-booked-list></ul>
+            <p class="booked-periods-hint">Choisissez des dates en dehors de ces périodes.</p>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-calendar-alt"></i> Période de location</h3>
+        <div class="agri-form-grid">
+            <div class="form-col-6">
+                {{ form_label(form.dateDebut, null, {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(form.dateDebut) }}
+                <div class="field-errors">{{ form_errors(form.dateDebut) }}</div>
+                <p class="muted field-help">Aujourd'hui ou une date future</p>
+            </div>
+
+            <div class="form-col-6">
+                {{ form_label(form.dateFin, null, {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(form.dateFin) }}
+                <div class="field-errors">{{ form_errors(form.dateFin) }}</div>
+                <p class="muted field-help">Doit être égale ou après la date de début</p>
+            </div>
+        </div>
+
+        <div class="date-range-visual js-date-range-visual" style="display: none;">
+            <div class="date-range-bar">
+                <span class="date-range-start" data-range-start></span>
+                <div class="date-range-line"></div>
+                <span class="date-range-end" data-range-end></span>
+            </div>
+            <p class="date-range-summary" data-range-summary></p>
+        </div>
+
+        <div class="date-conflict-warning js-date-conflict" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Attention: Les dates sélectionnées chevauchent une réservation existante.</span>
+        </div>
+    </div>
+
+    <div class="pricing-info-box">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            <strong>Comment est calculé le prix ?</strong>
+            <p>Le montant total = nombre de jours × prix journalier du matériel. Les dates de début et de fin sont incluses dans le calcul.</p>
+        </div>
+    </div>
+
+    <div class="actions form-actions">
+        <button class="button">
+            <i class="fas fa-save"></i> {{ button_label|default('Confirmer la réservation') }}
+        </button>
+        <a class="button secondary" href="{{ path('app_location_index', selectedUserId ? {'user_id': selectedUserId} : {}) }}">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+{{ form_end(form) }}
+
+<script>
+(function () {
+    const form = document.querySelector('.agri-form-shell');
+    if (!form) return;
+
+    const panel = form.querySelector('.js-rental-panel');
+    const startInput = form.querySelector('.js-rental-date-start');
+    const endInput = form.querySelector('.js-rental-date-end');
+    const materielSelect = form.querySelector('.js-rental-materiel');
+    const totalInput = form.querySelector('.js-rental-total-input');
+    const totalDisplay = form.querySelector('[data-rental-total-value]');
+    const dayDisplay = form.querySelector('[data-rental-days]');
+    const dailyDisplay = form.querySelector('[data-rental-daily]');
+    const rangeVisual = form.querySelector('.js-date-range-visual');
+    const rangeStart = form.querySelector('[data-range-start]');
+    const rangeEnd = form.querySelector('[data-range-end]');
+    const rangeSummary = form.querySelector('[data-range-summary]');
+    const bookedBox = form.querySelector('.js-booked-periods');
+    const bookedList = form.querySelector('[data-booked-list]');
+    const conflictWarning = form.querySelector('.js-date-conflict');
+
+    if (!panel || !startInput || !endInput || !materielSelect || !totalInput || !totalDisplay || !dayDisplay || !dailyDisplay) return;
+
+    let bookedPeriods = [];
+    let currentMaterielId = null;
+
+    const toDate = (value) => {
+        if (!value) return null;
+        const parsed = new Date(value + 'T00:00:00');
+        return Number.isNaN(parsed.getTime()) ? null : parsed;
+    };
+
+    const dayCount = (startDate, endDate) => {
+        if (!startDate || !endDate || endDate < startDate) return 0;
+        const dayMs = 24 * 60 * 60 * 1000;
+        return Math.floor((endDate - startDate) / dayMs) + 1;
+    };
+
+    const getDailyRate = () => {
+        const selected = materielSelect.options[materielSelect.selectedIndex];
+        if (!selected) return 0;
+        const raw = parseFloat(selected.getAttribute('data-price') || '0');
+        return Number.isFinite(raw) ? raw : 0;
+    };
+
+    const getMaterielId = () => {
+        const selected = materielSelect.options[materielSelect.selectedIndex];
+        if (!selected || !selected.value) return null;
+        return selected.value;
+    };
+
+    const formatMoney = (amount) => amount.toLocaleString('fr-TN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+
+    const formatDate = (date) => date.toLocaleDateString('fr-TN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
+
+    const formatPeriodDate = (dateStr) => {
+        const d = new Date(dateStr + 'T00:00:00');
+        return d.toLocaleDateString('fr-TN', { day: '2-digit', month: 'short' });
+    };
+
+    const datesOverlap = (start1, end1, start2, end2) => {
+        return start1 <= end2 && end1 >= start2;
+    };
+
+    const checkDateConflict = () => {
+        if (!conflictWarning || !startInput.value || !endInput.value) {
+            if (conflictWarning) conflictWarning.style.display = 'none';
+            return false;
+        }
+
+        const selStart = startInput.value;
+        const selEnd = endInput.value;
+
+        for (const period of bookedPeriods) {
+            if (datesOverlap(selStart, selEnd, period.start, period.end)) {
+                conflictWarning.style.display = 'flex';
+                return true;
+            }
+        }
+
+        conflictWarning.style.display = 'none';
+        return false;
+    };
+
+    const fetchBookedPeriods = async (materielId) => {
+        if (!materielId || !bookedBox || !bookedList) return;
+
+        try {
+            const response = await fetch(`/location/api/booked-periods/${materielId}`);
+            if (!response.ok) throw new Error('Failed to fetch');
+            const data = await response.json();
+            bookedPeriods = data.periods || [];
+
+            if (bookedPeriods.length > 0) {
+                bookedList.innerHTML = bookedPeriods.map(p => 
+                    `<li><i class="fas fa-ban"></i> ${formatPeriodDate(p.start)} → ${formatPeriodDate(p.end)}</li>`
+                ).join('');
+                bookedBox.style.display = 'block';
+            } else {
+                bookedBox.style.display = 'none';
+            }
+
+            checkDateConflict();
+        } catch (e) {
+            bookedPeriods = [];
+            if (bookedBox) bookedBox.style.display = 'none';
+        }
+    };
+
+    let previousTotal = null;
+
+    const update = () => {
+        const startDate = toDate(startInput.value);
+        const endDate = toDate(endInput.value);
+        const days = dayCount(startDate, endDate);
+        const dailyRate = getDailyRate();
+        const computedTotal = days > 0 ? (dailyRate * days) : dailyRate;
+
+        totalInput.value = computedTotal.toFixed(2);
+        totalDisplay.textContent = formatMoney(computedTotal);
+        dayDisplay.textContent = String(days > 0 ? days : 1);
+        dailyDisplay.textContent = formatMoney(dailyRate);
+
+        // Update date range visual
+        if (rangeVisual && rangeStart && rangeEnd && rangeSummary && startDate && endDate && days > 0) {
+            rangeVisual.style.display = 'block';
+            rangeStart.textContent = formatDate(startDate);
+            rangeEnd.textContent = formatDate(endDate);
+            rangeSummary.textContent = `${days} jour${days > 1 ? 's' : ''} de location`;
+        } else if (rangeVisual) {
+            rangeVisual.style.display = 'none';
+        }
+
+        // Check conflict
+        checkDateConflict();
+
+        // Animate on change
+        if (previousTotal === null || Math.abs(previousTotal - computedTotal) > 0.009) {
+            panel.classList.remove('is-updating');
+            void panel.offsetWidth;
+            panel.classList.add('is-updating');
+        }
+
+        previousTotal = computedTotal;
+
+        // Auto-set end date min
+        if (startInput.value) {
+            endInput.setAttribute('min', startInput.value);
+        }
+    };
+
+    const onMaterielChange = () => {
+        const newId = getMaterielId();
+        if (newId !== currentMaterielId) {
+            currentMaterielId = newId;
+            fetchBookedPeriods(newId);
+        }
+        update();
+    };
+
+    ['input', 'change'].forEach((eventName) => {
+        startInput.addEventListener(eventName, update);
+        endInput.addEventListener(eventName, update);
+    });
+
+    materielSelect.addEventListener('change', onMaterielChange);
+
+    // Initial load
+    onMaterielChange();
+})();
+</script>

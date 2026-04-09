@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Switch User{% endblock %}
+
+{% block body %}
+    <section class="card module-head">
+        <div>
+            <div class="module-title">
+                <span class="module-icon"><i class="fas fa-user-friends"></i></span>
+                <h1>Switch User Context</h1>
+            </div>
+            <p class="module-sub">Choose the active user. All marketplace, location, and panne actions will use this selected profile.</p>
+        </div>
+    </section>
+
+    <section class="user-switch-grid">
+        {% for user in users %}
+            {% set isCurrent = current_user and current_user.id == user.id %}
+            <article class="user-switch-card{{ isCurrent ? ' is-current' : '' }}">
+                <div class="user-switch-top">
+                    <div>
+                        <h3>{{ user.prenom }} {{ user.nom }}</h3>
+                        <p>{{ user.email }}</p>
+                    </div>
+                    {% if isCurrent %}
+                        <span class="status-pill active">Active</span>
+                    {% endif %}
+                </div>
+
+                <p class="row-meta">Role: {{ user.role }} | ID: {{ user.id }}</p>
+
+                {% if not isCurrent %}
+                    <form method="post" action="{{ path('app_user_switch_apply', {'id': user.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('switch_user_' ~ user.id) }}">
+                        <input type="hidden" name="redirect_to" value="{{ redirect_to ?: app.request.headers.get('referer') }}">
+                        <button class="button" type="submit">Switch to this user</button>
+                    </form>
+                {% else %}
+                    <a class="button secondary" href="{{ path('app_materiel_index', {'user_id': user.id}) }}">Go to marketplace</a>
+                {% endif %}
+            </article>
+        {% else %}
+            <article class="card">
+                <h3>No users found</h3>
+                <p class="muted">Add utilisateurs in the database to start using the app context workflow.</p>
+            </article>
+        {% endfor %}
+    </section>
+{% endblock %}

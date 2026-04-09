@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Materiel Details{% endblock %}
+
+{% block body %}
+    {% set fallbackImage = asset('ecova/images/h2-slide1.jpg') %}
+    {% set imagePath = materiel.imageUrl ?: '' %}
+    {% set imageSrc = imagePath %}
+    {% set statusClass = materiel.etat == 'Disponible' ? 'status-pill active' : (materiel.etat == 'Loue' ? 'status-pill done' : 'status-pill incident') %}
+    {% if imagePath and (imagePath starts with('http://') == false) and (imagePath starts with('https://') == false) and (imagePath starts with('//') == false) %}
+        {% set imageSrc = asset(imagePath starts with('/') ? imagePath|slice(1) : imagePath) %}
+    {% endif %}
+
+    <section class="card">
+        <h1>Materiel #{{ materiel.id }}</h1>
+        <div class="material-form-preview">
+            <p>Material Image</p>
+            <img class="materiel-thumb-lg" src="{{ imageSrc ?: fallbackImage }}" alt="{{ materiel.nom }}" onerror="this.onerror=null;this.src='{{ fallbackImage }}';">
+        </div>
+        <table>
+            <tbody>
+                <tr><th>Nom</th><td>{{ materiel.nom }}</td></tr>
+                <tr><th>Type</th><td>{{ materiel.type }}</td></tr>
+                <tr><th>Description</th><td>{{ materiel.description ?: '-' }}</td></tr>
+                <tr><th>Prix location</th><td>{{ materiel.prixLocation is not null ? materiel.prixLocation|number_format(2, '.', ' ') ~ ' TND/day' : '-' }}</td></tr>
+                <tr><th>Etat</th><td><span class="{{ statusClass }}">{{ materiel.etat ?: 'N/A' }}</span></td></tr>
+                <tr><th>Image URL</th><td>{{ materiel.imageUrl ?: '-' }}</td></tr>
+                <tr><th>Date ajout</th><td>{{ materiel.dateAjout ? materiel.dateAjout|date('Y-m-d H:i') : '-' }}</td></tr>
+                <tr><th>Proprietaire</th><td>{{ materiel.proprietaire ? materiel.proprietaire.prenom ~ ' ' ~ materiel.proprietaire.nom : '-' }}</td></tr>
+            </tbody>
+        </table>
+
+        <div class="actions">
+            <a class="button secondary" href="{{ path('app_materiel_index', {'user_id': current_user.id}) }}">Back</a>
+            <a class="button" href="{{ path('app_materiel_edit', {'id': materiel.id, 'user_id': current_user.id}) }}">Edit</a>
+            {% include 'materiel/_delete_form.html.twig' %}
+        </div>
+    </section>
+{% endblock %}

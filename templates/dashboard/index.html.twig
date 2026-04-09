@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard - Agrinova{% endblock %}
+
+{% block body %}
+    <section class="card module-head">
+        <div>
+            <div class="module-title">
+                <span class="module-icon"><i class="fas fa-chart-line"></i></span>
+                <h1>Control Center</h1>
+            </div>
+            <p class="module-sub">Select a user context to apply ownership filtering, then navigate between marketplace, rentals, and incidents.</p>
+        </div>
+        {% if current_user %}
+            <div class="actions">
+                <a class="button" href="{{ path('app_materiel_index', {'user_id': current_user.id}) }}">Open Marketplace</a>
+                <a class="button secondary" href="{{ path('app_location_index', {'user_id': current_user.id}) }}">Open Locations</a>
+                <a class="button secondary" href="{{ path('app_panne_index', {'user_id': current_user.id}) }}">Open Pannes</a>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="kpi-grid">
+        <article class="kpi-card records">
+            <span class="kpi-label">Users</span>
+            <p class="kpi-value">{{ stats.users }}</p>
+        </article>
+        <article class="kpi-card active">
+            <span class="kpi-label">Materials (Total)</span>
+            <p class="kpi-value">{{ stats.materiels_total }}</p>
+        </article>
+        <article class="kpi-card records">
+            <span class="kpi-label">Materials Available</span>
+            <p class="kpi-value">{{ stats.materiels_available }}</p>
+        </article>
+        <article class="kpi-card active">
+            <span class="kpi-label">Active Locations</span>
+            <p class="kpi-value">{{ stats.active_locations }}</p>
+        </article>
+        <article class="kpi-card unresolved">
+            <span class="kpi-label">Unresolved Pannes</span>
+            <p class="kpi-value">{{ stats.unresolved_pannes }}</p>
+        </article>
+    </section>
+
+    <section class="card" id="users-section">
+        <h2>Available Users</h2>
+        <p class="muted">Switch context by selecting a user. All module actions will then run inside that selected user scope.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Prenom</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.nom }}</td>
+                        <td>{{ user.prenom }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role }}</td>
+                        <td class="actions">
+                            <a class="button" href="{{ path('app_materiel_index', {'user_id': user.id}) }}">Marketplace</a>
+                            <a class="button secondary" href="{{ path('app_location_index', {'user_id': user.id}) }}">Locations</a>
+                            <a class="button secondary" href="{{ path('app_panne_index', {'user_id': user.id}) }}">Pannes</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6">No users found in table utilisateur.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    {% if current_user %}
+        <section class="card">
+            <h2>Current Context</h2>
+            <p>
+                {{ current_user.prenom }} {{ current_user.nom }} (ID {{ current_user.id }})
+            </p>
+            <div class="actions">
+                <a class="button" href="{{ path('app_materiel_index', {'user_id': current_user.id}) }}">Marketplace</a>
+                <a class="button" href="{{ path('app_location_index', {'user_id': current_user.id}) }}">Locations</a>
+                <a class="button" href="{{ path('app_panne_index', {'user_id': current_user.id}) }}">Pannes</a>
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}

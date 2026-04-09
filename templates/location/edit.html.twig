@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Location{% endblock %}
+
+{% block body %}
+    <section class="card">
+        <h1>Edit Location #{{ location.id }}</h1>
+        <p class="muted">Status is automatic: En cours, Terminee, or Annulee (via Cancel action). Overlapping reservations for the same material are blocked automatically.</p>
+        {% include 'location/_form.html.twig' with {form: form, current_user: current_user, button_label: 'Update'} %}
+    </section>
+{% endblock %}

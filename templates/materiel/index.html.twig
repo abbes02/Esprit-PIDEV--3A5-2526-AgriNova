@@ -1,0 +1,422 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Marketplace Matériel{% endblock %}
+
+{% block body %}
+    {% set fallbackImage = asset('ecova/images/h2-slide1.jpg') %}
+    {% set availableCount = materiels|filter(m => m.etat == 'Disponible')|length %}
+    {% set rentedCount = materiels|filter(m => m.etat == 'Loue')|length %}
+    {% set panneCount = materiels|filter(m => m.etat == 'En Panne')|length %}
+
+    {# Menu toggle button #}
+    <button class="menu-toggle-btn" id="menuToggle" type="button">
+        <span class="icon-open">☰</span>
+        <span class="icon-close">✕</span>
+    </button>
+    <script>
+    (function() {
+        var btn = document.getElementById('menuToggle');
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.toggle('menu-expanded');
+            });
+        }
+    })();
+    </script>
+
+    {# View toggle: 3D / Static #}
+    <div class="view-toggle-bar" id="view-toggle-bar">
+        <button class="view-toggle-btn is-active" id="btn-3d-view" type="button">
+            <i class="fas fa-cube"></i> 3D Marketplace
+        </button>
+        <button class="view-toggle-btn" id="btn-static-view" type="button">
+            <i class="fas fa-th-large"></i> Marketplace Statique
+        </button>
+    </div>
+
+    {# Compact floating header with stats integrated (3D mode) #}
+    <header class="farm-3d-header" id="farm-header">
+        <div class="header-top">
+            <div class="header-title">
+                <span class="header-icon"><i class="fas fa-tractor"></i></span>
+                <h1>Marketplace 3D</h1>
+            </div>
+            <a class="header-btn" href="{{ path('app_materiel_new', {'user_id': current_user.id}) }}">
+                <i class="fas fa-plus"></i> Ajouter
+            </a>
+        </div>
+        
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="stat-value">{{ stats.records }}</span>
+                <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item available">
+                <span class="stat-value">{{ availableCount }}</span>
+                <span class="stat-label">Disponibles</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item rented">
+                <span class="stat-value">{{ rentedCount }}</span>
+                <span class="stat-label">Loués</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item panne">
+                <span class="stat-value">{{ panneCount }}</span>
+                <span class="stat-label">En panne</span>
+            </div>
+        </div>
+        
+        <p class="header-hint">
+            <i class="fas fa-mouse"></i> Scrollez pour explorer
+            <span class="divider">•</span>
+            <i class="fas fa-hand-pointer"></i> Cliquez pour voir les détails
+        </p>
+    </header>
+
+    {# Scroll hint for 3D navigation #}
+    {% if materiels is not empty %}
+        <div class="scroll-hint" id="scroll-hint">
+            <i class="fas fa-chevron-down"></i>
+            <span>Scrollez pour explorer</span>
+        </div>
+        
+        {# Spacer to enable scrolling - calculated for grid layout #}
+        {% set cardsPerRow = 3 %}
+        {% set rowCount = ((materiels|length) / cardsPerRow)|round(0, 'ceil') %}
+        <div class="farm-3d-spacer" style="height: {{ rowCount * 600 + 400 }}px;"></div>
+    {% endif %}
+
+    {% if materiels is empty %}
+        <section class="card empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-seedling"></i>
+            </div>
+            <h2>Aucun matériel disponible</h2>
+            <p class="muted">Soyez le premier à publier votre matériel sur le marketplace!</p>
+            <div class="actions">
+                <a class="button" href="{{ path('app_materiel_new', {'user_id': current_user.id}) }}">
+                    <i class="fas fa-plus"></i> Créer une annonce
+                </a>
+            </div>
+        </section>
+    {% else %}
+        <div class="search-sort-bar" id="marketplace-toolbar">
+            <div class="search-input-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" class="search-input" id="marketplace-search" placeholder="Rechercher par nom, type, propriétaire..." autocomplete="off">
+            </div>
+            <select class="sort-select" id="marketplace-sort">
+                <option value="name-asc">Nom A → Z</option>
+                <option value="name-desc">Nom Z → A</option>
+                <option value="price-asc">Prix croissant</option>
+                <option value="price-desc">Prix décroissant</option>
+                <option value="date-desc">Plus récent</option>
+                <option value="date-asc">Plus ancien</option>
+                <option value="status">Statut</option>
+            </select>
+            <select class="sort-select" id="marketplace-filter-status">
+                <option value="">Tous les statuts</option>
+                <option value="available">Disponible</option>
+                <option value="rented">Loué</option>
+                <option value="down">En panne</option>
+            </select>
+            <span class="search-count" id="marketplace-count"><strong>{{ materiels|length }}</strong> matériel(s)</span>
+        </div>
+
+        <section class="marketplace-grid" id="marketplace-grid">
+            {% for materiel in materiels %}
+                {% set imagePath = materiel.imageUrl ?: '' %}
+                {% set imageSrc = imagePath %}
+                {% set description = materiel.description ?: 'Pas de description disponible pour ce matériel.' %}
+                {% set shortDescription = description|length > 120 ? description|slice(0, 117) ~ '...' : description %}
+                {% set openPanne = materiel.latestOpenPanne %}
+                {% set statusClass = materiel.etat == 'Disponible' ? 'available' : (materiel.etat == 'Loue' ? 'rented' : 'down') %}
+                {% set isOwner = materiel.proprietaire and materiel.proprietaire.id == current_user.id %}
+                {% set ownerLabel = materiel.proprietaire ? (materiel.proprietaire.prenom ~ ' ' ~ materiel.proprietaire.nom)|trim : 'Propriétaire inconnu' %}
+                {% set typeIcon = materiel.typeIcon ?? 'fa-box' %}
+                {% set typeLabel = materiel.typeLabel ?? materiel.type ?? 'Autre' %}
+
+                {% if imagePath and (imagePath starts with('http://') == false) and (imagePath starts with('https://') == false) and (imagePath starts with('//') == false) %}
+                    {% set imageSrc = asset(imagePath starts with('/') ? imagePath|slice(1) : imagePath) %}
+                {% endif %}
+
+                <article class="market-card {{ isOwner ? 'is-owned' : '' }} status-{{ statusClass }}"
+                    data-name="{{ materiel.nom|lower }}"
+                    data-type="{{ typeLabel|lower }}"
+                    data-owner="{{ ownerLabel|lower }}"
+                    data-price="{{ materiel.prixLocation }}"
+                    data-date="{{ materiel.dateAjout ? materiel.dateAjout|date('Y-m-d') : '1970-01-01' }}"
+                    data-status="{{ statusClass }}"
+                >
+                    <div class="market-card-media-wrap">
+                        <img
+                            class="market-card-media"
+                            src="{{ imageSrc ?: fallbackImage }}"
+                            alt="{{ materiel.nom }}"
+                            loading="lazy"
+                            onerror="this.onerror=null;this.src='{{ fallbackImage }}';"
+                        >
+                        <div class="market-status-overlay">
+                            <span class="market-status {{ statusClass }}">
+                                {% if statusClass == 'available' %}
+                                    <i class="fas fa-check-circle"></i>
+                                {% elseif statusClass == 'rented' %}
+                                    <i class="fas fa-clock"></i>
+                                {% else %}
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                {% endif %}
+                                {{ materiel.etat }}
+                            </span>
+                            {% if isOwner %}
+                                <span class="owner-badge"><i class="fas fa-user"></i> Mon matériel</span>
+                            {% endif %}
+                        </div>
+                        <span class="market-type-badge">
+                            <i class="fas {{ typeIcon }}"></i> {{ typeLabel }}
+                        </span>
+                    </div>
+
+                    <div class="market-card-body">
+                        <div class="market-topline">
+                            <h3 class="market-title">{{ materiel.nom }}</h3>
+                        </div>
+
+                        <p class="market-copy">{{ shortDescription }}</p>
+
+                        {% if openPanne %}
+                            {% set panneText = openPanne.descriptionPanne ?: 'Incident signalé.' %}
+                            {% set shortPanneText = panneText|length > 80 ? panneText|slice(0, 77) ~ '...' : panneText %}
+                            {% set panneSeverity = openPanne.severity ?? 'minor' %}
+                            <div class="market-panne-snippet severity-{{ panneSeverity }}" role="alert">
+                                <span class="market-panne-label">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Panne {{ openPanne.severityLabel ?? 'signalée' }}
+                                </span>
+                                <p>{{ shortPanneText }}</p>
+                            </div>
+                        {% endif %}
+
+                        <div class="market-owner-row">
+                            <i class="fas fa-user-circle"></i>
+                            <span>{{ ownerLabel }}</span>
+                        </div>
+
+                        <div class="market-price-row">
+                            <div class="market-price-main">
+                                <span class="market-price">{{ materiel.prixLocation|number_format(2, '.', ' ') }}</span>
+                                <span class="market-currency">TND</span>
+                            </div>
+                            <span class="market-unit">/ jour</span>
+                        </div>
+
+                        <p class="market-meta">
+                            <i class="far fa-calendar-alt"></i>
+                            Ajouté {{ materiel.dateAjout ? materiel.dateAjout|date('d/m/Y') : '-' }}
+                        </p>
+
+                        <div class="market-actions">
+                            {% if materiel.etat == 'Disponible' %}
+                                {% if isOwner %}
+                                    <span class="button secondary is-disabled full-width">
+                                        <i class="fas fa-user-check"></i> Votre annonce
+                                    </span>
+                                {% else %}
+                                    <a class="button rent-now full-width" href="{{ path('app_location_new', {'user_id': current_user.id, 'materiel_id': materiel.id}) }}">
+                                        <i class="fas fa-calendar-plus"></i> Louer maintenant
+                                    </a>
+                                {% endif %}
+                            {% elseif materiel.etat == 'Loue' %}
+                                <span class="button secondary is-disabled full-width">
+                                    <i class="fas fa-clock"></i> Déjà loué
+                                </span>
+                            {% else %}
+                                <span class="button danger is-disabled full-width">
+                                    <i class="fas fa-ban"></i> Indisponible
+                                </span>
+                            {% endif %}
+
+                            {% if isOwner %}
+                                <div class="owner-actions">
+                                    <a class="button secondary small" href="{{ path('app_materiel_show', {'id': materiel.id, 'user_id': current_user.id}) }}" title="Voir détails">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a class="button small" href="{{ path('app_materiel_edit', {'id': materiel.id, 'user_id': current_user.id}) }}" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% include 'materiel/_delete_form.html.twig' %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </section>
+    {% endif %}
+
+    {# Pass materiel data to 3D scene #}
+    <script id="farm-equipment-data" type="application/json">
+    [
+        {% for materiel in materiels %}
+        {
+            "id": {{ materiel.id }},
+            "nom": {{ materiel.nom|json_encode|raw }},
+            "type": {{ materiel.type|json_encode|raw }},
+            "typeLabel": {{ materiel.typeLabel|json_encode|raw }},
+            "description": {{ (materiel.description ?? '')|slice(0, 150)|json_encode|raw }},
+            "prixLocation": {{ materiel.prixLocation }},
+            "etat": {{ materiel.etat|json_encode|raw }},
+            "imageUrl": {{ (materiel.imageUrl ?? '')|json_encode|raw }},
+            "proprietaire": {{ (materiel.proprietaire ? materiel.proprietaire.prenom ~ ' ' ~ materiel.proprietaire.nom : 'Inconnu')|json_encode|raw }},
+            "showUrl": "{{ path('app_materiel_show', {'id': materiel.id}) }}",
+            "rentUrl": "{{ path('app_location_new', {'materiel_id': materiel.id, 'user_id': current_user.id}) }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+    </script>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+    (function() {
+        /* ===== 3D / Static View Toggle ===== */
+        var btn3d = document.getElementById('btn-3d-view');
+        var btnStatic = document.getElementById('btn-static-view');
+
+        function setViewMode(mode) {
+            if (mode === 'static') {
+                document.body.classList.add('static-marketplace');
+                if (btnStatic) { btnStatic.classList.add('is-active'); }
+                if (btn3d) { btn3d.classList.remove('is-active'); }
+                try { localStorage.setItem('agrinova_view_mode', 'static'); } catch(e) {}
+            } else {
+                document.body.classList.remove('static-marketplace');
+                if (btn3d) { btn3d.classList.add('is-active'); }
+                if (btnStatic) { btnStatic.classList.remove('is-active'); }
+                try { localStorage.setItem('agrinova_view_mode', '3d'); } catch(e) {}
+                /* Refresh GSAP ScrollTrigger so it recalculates spacer dimensions */
+                if (window.ScrollTrigger) {
+                    requestAnimationFrame(function() { window.ScrollTrigger.refresh(); });
+                }
+            }
+        }
+
+        if (btn3d) btn3d.addEventListener('click', function() { setViewMode('3d'); });
+        if (btnStatic) btnStatic.addEventListener('click', function() { setViewMode('static'); });
+
+        /* Do NOT auto-restore 'static' before GSAP initializes —
+           custom.js module (deferred) sets up ScrollTrigger with the spacer visible.
+           Restoring 'static' eagerly would hide the spacer and break scroll. */
+
+        /* ===== Search, Sort & Filter ===== */
+        var grid = document.getElementById('marketplace-grid');
+        var searchInput = document.getElementById('marketplace-search');
+        var sortSelect = document.getElementById('marketplace-sort');
+        var filterStatus = document.getElementById('marketplace-filter-status');
+        var countEl = document.getElementById('marketplace-count');
+        if (!searchInput) return;
+
+        function dispatch3dFilter(query, status) {
+            document.dispatchEvent(new CustomEvent('agriech:filter-equipment', {
+                detail: { query: query, status: status }
+            }));
+        }
+
+        function applyFilters() {
+            var query = searchInput.value.toLowerCase().trim();
+            var status = filterStatus ? filterStatus.value : '';
+
+            /* Always dispatch to 3D scene */
+            dispatch3dFilter(query, status);
+
+            /* Also filter static grid cards if present */
+            if (!grid) return;
+            var cards = Array.from(grid.querySelectorAll('.market-card'));
+            var visible = 0;
+
+            cards.forEach(function(card) {
+                var name = card.getAttribute('data-name') || '';
+                var type = card.getAttribute('data-type') || '';
+                var owner = card.getAttribute('data-owner') || '';
+                var cardStatus = card.getAttribute('data-status') || '';
+                var matchSearch = !query || name.indexOf(query) !== -1 || type.indexOf(query) !== -1 || owner.indexOf(query) !== -1;
+                var matchStatus = !status || cardStatus === status;
+                if (matchSearch && matchStatus) {
+                    card.style.display = '';
+                    visible++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (countEl) countEl.innerHTML = '<strong>' + visible + '</strong> matériel(s)';
+        }
+
+        function applySort() {
+            var val = sortSelect ? sortSelect.value : 'name-asc';
+            if (!grid) return;
+            var cards = Array.from(grid.querySelectorAll('.market-card'));
+            var statusOrder = { available: 0, rented: 1, down: 2 };
+
+            cards.sort(function(a, b) {
+                switch (val) {
+                    case 'name-asc': return (a.getAttribute('data-name') || '').localeCompare(b.getAttribute('data-name') || '');
+                    case 'name-desc': return (b.getAttribute('data-name') || '').localeCompare(a.getAttribute('data-name') || '');
+                    case 'price-asc': return parseFloat(a.getAttribute('data-price') || 0) - parseFloat(b.getAttribute('data-price') || 0);
+                    case 'price-desc': return parseFloat(b.getAttribute('data-price') || 0) - parseFloat(a.getAttribute('data-price') || 0);
+                    case 'date-desc': return (b.getAttribute('data-date') || '').localeCompare(a.getAttribute('data-date') || '');
+                    case 'date-asc': return (a.getAttribute('data-date') || '').localeCompare(b.getAttribute('data-date') || '');
+                    case 'status': return (statusOrder[a.getAttribute('data-status')] || 0) - (statusOrder[b.getAttribute('data-status')] || 0);
+                    default: return 0;
+                }
+            });
+
+            cards.forEach(function(card) { grid.appendChild(card); });
+            applyFilters();
+        }
+
+        searchInput.addEventListener('input', applyFilters);
+        if (filterStatus) filterStatus.addEventListener('change', applyFilters);
+        if (sortSelect) sortSelect.addEventListener('change', applySort);
+    })();
+    </script>
+    <script>
+    /* Draggable 3D header */
+    (function() {
+        var el = document.getElementById('farm-header');
+        if (!el) return;
+        var dragging = false, startX, startY, origX, origY;
+
+        el.addEventListener('mousedown', function(e) {
+            if (e.target.closest('a, button, select, input')) return;
+            dragging = true;
+            el.classList.add('is-dragging');
+            var rect = el.getBoundingClientRect();
+            origX = rect.left;
+            origY = rect.top;
+            startX = e.clientX;
+            startY = e.clientY;
+            el.style.left = origX + 'px';
+            el.style.top = origY + 'px';
+            el.style.transform = 'none';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!dragging) return;
+            el.style.left = (origX + e.clientX - startX) + 'px';
+            el.style.top = (origY + e.clientY - startY) + 'px';
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (!dragging) return;
+            dragging = false;
+            el.classList.remove('is-dragging');
+        });
+    })();
+    </script>
+{% endblock %}

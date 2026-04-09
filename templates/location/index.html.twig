@@ -1,0 +1,260 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Locations{% endblock %}
+
+{% block body %}
+    <section class="card module-head">
+        <div>
+            <div class="module-title">
+                <span class="module-icon"><i class="far fa-calendar-alt"></i></span>
+                <h1>Mes Locations</h1>
+            </div>
+            <p class="module-sub">Gérez vos réservations de matériel agricole</p>
+        </div>
+        <div class="actions">
+            <a class="button" href="{{ path('app_location_new', {'user_id': current_user.id}) }}">
+                <i class="fas fa-plus"></i> Nouvelle Location
+            </a>
+        </div>
+    </section>
+
+    <section class="kpi-grid kpi-grid-4">
+        <article class="kpi-card records">
+            <span class="kpi-icon"><i class="fas fa-list"></i></span>
+            <div class="kpi-content">
+                <span class="kpi-label">Total Locations</span>
+                <p class="kpi-value">{{ stats.records }}</p>
+            </div>
+        </article>
+        <article class="kpi-card active">
+            <span class="kpi-icon"><i class="fas fa-clock"></i></span>
+            <div class="kpi-content">
+                <span class="kpi-label">En Cours</span>
+                <p class="kpi-value">{{ stats.active_locations }}</p>
+            </div>
+        </article>
+        <article class="kpi-card unresolved">
+            <span class="kpi-icon"><i class="fas fa-exclamation-circle"></i></span>
+            <div class="kpi-content">
+                <span class="kpi-label">Pannes Actives</span>
+                <p class="kpi-value">{{ stats.unresolved_pannes }}</p>
+            </div>
+        </article>
+        <article class="kpi-card completed">
+            <span class="kpi-icon"><i class="fas fa-check-circle"></i></span>
+            <div class="kpi-content">
+                <span class="kpi-label">Terminées</span>
+                <p class="kpi-value">{{ stats.records - stats.active_locations }}</p>
+            </div>
+        </article>
+    </section>
+
+    {% if locations is empty %}
+        <section class="card empty-state">
+            <div class="empty-state-icon">
+                <i class="far fa-calendar-plus"></i>
+            </div>
+            <h2>Aucune location</h2>
+            <p class="muted">Vous n'avez pas encore de location. Parcourez le marketplace pour trouver du matériel à louer.</p>
+            <div class="actions">
+                <a class="button" href="{{ path('app_materiel_index', {'user_id': current_user.id}) }}">
+                    <i class="fas fa-search"></i> Voir le Marketplace
+                </a>
+            </div>
+        </section>
+    {% else %}
+        <div class="search-sort-bar" id="location-toolbar">
+            <div class="search-input-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" class="search-input" id="location-search" placeholder="Rechercher par matériel, type, dates..." autocomplete="off">
+            </div>
+            <select class="sort-select" id="location-sort">
+                <option value="date-desc">Plus récent</option>
+                <option value="date-asc">Plus ancien</option>
+                <option value="name-asc">Matériel A → Z</option>
+                <option value="name-desc">Matériel Z → A</option>
+                <option value="price-desc">Montant décroissant</option>
+                <option value="price-asc">Montant croissant</option>
+                <option value="status">Statut</option>
+            </select>
+            <select class="sort-select" id="location-filter-status">
+                <option value="">Tous les statuts</option>
+                <option value="active">En cours</option>
+                <option value="done">Terminée</option>
+                <option value="cancelled">Annulée</option>
+            </select>
+            <span class="search-count" id="location-count"><strong>{{ locations|length }}</strong> location(s)</span>
+        </div>
+
+        <section class="location-grid" id="location-grid">
+            {% for location in locations %}
+                {% set statusClass = location.statut == 'Annulee' ? 'cancelled' : (location.statut == 'Terminee' ? 'done' : 'active') %}
+                {% set dayCount = (location.dateDebut and location.dateFin and location.dateFin >= location.dateDebut) ? (location.dateDebut.diff(location.dateFin).days + 1) : 0 %}
+                {% set dailyRate = (dayCount > 0 and location.montantTotal is not null) ? (location.montantTotal / dayCount) : null %}
+                {% set canReportPanne = location.materiel and (location.statut is empty or location.statut == 'En cours') %}
+                {% set today = "now"|date("Y-m-d") %}
+                {% set startDate = location.dateDebut ? location.dateDebut|date("Y-m-d") : null %}
+                {% set endDate = location.dateFin ? location.dateFin|date("Y-m-d") : null %}
+                
+                {# Calculate progress percentage #}
+                {% set progressPercent = 0 %}
+                {% if startDate and endDate and dayCount > 0 and statusClass == 'active' %}
+                    {% set totalDays = dayCount %}
+                    {% set daysElapsed = max(0, ((today|date('U') - startDate|date('U')) / 86400)|round(0, 'floor') + 1) %}
+                    {% set progressPercent = min(100, max(0, (daysElapsed / totalDays * 100)|round)) %}
+                {% elseif statusClass == 'done' %}
+                    {% set progressPercent = 100 %}
+                {% endif %}
+
+                <article class="location-card status-{{ statusClass }}"
+                    data-name="{{ location.materiel ? location.materiel.nom|lower : '' }}"
+                    data-type="{{ location.materiel ? (location.materiel.typeLabel ?? location.materiel.type)|lower : '' }}"
+                    data-price="{{ location.montantTotal ?? 0 }}"
+                    data-date="{{ location.dateDebut ? location.dateDebut|date('Y-m-d') : '1970-01-01' }}"
+                    data-status="{{ statusClass }}"
+                >
+                    <div class="location-card-header">
+                        <span class="location-id">#{{ location.id }}</span>
+                        <span class="status-pill {{ statusClass }}">
+                            {% if statusClass == 'active' %}
+                                <i class="fas fa-clock"></i> En cours
+                            {% elseif statusClass == 'done' %}
+                                <i class="fas fa-check"></i> Terminée
+                            {% else %}
+                                <i class="fas fa-ban"></i> Annulée
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    {% if location.materiel %}
+                        <div class="location-materiel-info">
+                            <i class="fas {{ location.materiel.typeIcon ?? 'fa-box' }} materiel-type-icon"></i>
+                            <div>
+                                <strong class="materiel-name">{{ location.materiel.nom }}</strong>
+                                <span class="materiel-type">{{ location.materiel.typeLabel ?? location.materiel.type }}</span>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="location-dates">
+                        <div class="date-range">
+                            <div class="date-item">
+                                <span class="date-label">Début</span>
+                                <span class="date-value">{{ location.dateDebut ? location.dateDebut|date('d/m/Y') : '-' }}</span>
+                            </div>
+                            <i class="fas fa-arrow-right date-arrow"></i>
+                            <div class="date-item">
+                                <span class="date-label">Fin</span>
+                                <span class="date-value">{{ location.dateFin ? location.dateFin|date('d/m/Y') : '-' }}</span>
+                            </div>
+                        </div>
+                        
+                        {% if statusClass == 'active' and progressPercent > 0 %}
+                            <div class="location-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ progressPercent }}%"></div>
+                                </div>
+                                <span class="progress-text">{{ progressPercent }}% écoulé</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="location-pricing">
+                        <div class="pricing-main">
+                            <span class="pricing-label">Total</span>
+                            <span class="pricing-value">{{ location.montantTotal is not null ? location.montantTotal|number_format(2, '.', ' ') : '0.00' }} <small>TND</small></span>
+                        </div>
+                        <div class="pricing-details">
+                            <span><i class="fas fa-calendar-day"></i> {{ dayCount }} jour(s)</span>
+                            {% if dailyRate is not null %}
+                                <span><i class="fas fa-tag"></i> {{ dailyRate|number_format(2, '.', ' ') }} TND/jour</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="location-card-actions">
+                        <a class="button secondary small" href="{{ path('app_location_show', {'id': location.id, 'user_id': current_user.id}) }}">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        {% if statusClass != 'cancelled' %}
+                            <a class="button small" href="{{ path('app_location_edit', {'id': location.id, 'user_id': current_user.id}) }}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        {% endif %}
+                        {% if canReportPanne %}
+                            <a class="button warning small" href="{{ path('app_panne_new', {'user_id': current_user.id, 'materiel_id': location.materiel.id}) }}" title="Signaler une panne">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </a>
+                        {% endif %}
+                        {% if location.statut != 'Annulee' and statusClass == 'active' %}
+                            {% include 'location/_cancel_form.html.twig' %}
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        </section>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+    (function() {
+        var grid = document.getElementById('location-grid');
+        var searchInput = document.getElementById('location-search');
+        var sortSelect = document.getElementById('location-sort');
+        var filterStatus = document.getElementById('location-filter-status');
+        var countEl = document.getElementById('location-count');
+        if (!grid || !searchInput) return;
+
+        function applyFilters() {
+            var query = searchInput.value.toLowerCase().trim();
+            var status = filterStatus ? filterStatus.value : '';
+            var cards = Array.from(grid.querySelectorAll('.location-card'));
+            var visible = 0;
+
+            cards.forEach(function(card) {
+                var name = card.getAttribute('data-name') || '';
+                var type = card.getAttribute('data-type') || '';
+                var cardStatus = card.getAttribute('data-status') || '';
+                var matchSearch = !query || name.indexOf(query) !== -1 || type.indexOf(query) !== -1;
+                var matchStatus = !status || cardStatus === status;
+                if (matchSearch && matchStatus) {
+                    card.style.display = '';
+                    visible++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (countEl) countEl.innerHTML = '<strong>' + visible + '</strong> location(s)';
+        }
+
+        function applySort() {
+            var val = sortSelect ? sortSelect.value : 'date-desc';
+            var cards = Array.from(grid.querySelectorAll('.location-card'));
+            var statusOrder = { active: 0, done: 1, cancelled: 2 };
+
+            cards.sort(function(a, b) {
+                switch (val) {
+                    case 'name-asc': return (a.getAttribute('data-name') || '').localeCompare(b.getAttribute('data-name') || '');
+                    case 'name-desc': return (b.getAttribute('data-name') || '').localeCompare(a.getAttribute('data-name') || '');
+                    case 'price-asc': return parseFloat(a.getAttribute('data-price') || 0) - parseFloat(b.getAttribute('data-price') || 0);
+                    case 'price-desc': return parseFloat(b.getAttribute('data-price') || 0) - parseFloat(a.getAttribute('data-price') || 0);
+                    case 'date-desc': return (b.getAttribute('data-date') || '').localeCompare(a.getAttribute('data-date') || '');
+                    case 'date-asc': return (a.getAttribute('data-date') || '').localeCompare(b.getAttribute('data-date') || '');
+                    case 'status': return (statusOrder[a.getAttribute('data-status')] || 0) - (statusOrder[b.getAttribute('data-status')] || 0);
+                    default: return 0;
+                }
+            });
+
+            cards.forEach(function(card) { grid.appendChild(card); });
+            applyFilters();
+        }
+
+        searchInput.addEventListener('input', applyFilters);
+        if (filterStatus) filterStatus.addEventListener('change', applyFilters);
+        if (sortSelect) sortSelect.addEventListener('change', applySort);
+    })();
+    </script>
+{% endblock %}

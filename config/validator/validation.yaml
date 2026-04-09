@@ -1,0 +1,66 @@
+App\Entity\Utilisateur:
+    properties:
+        nom:
+            - NotBlank: ~
+        prenom:
+            - NotBlank: ~
+        email:
+            - NotBlank: ~
+            - Email: ~
+        role:
+            - NotBlank: ~
+
+App\Entity\Materiel:
+    properties:
+        nom:
+            - NotBlank: ~
+        type:
+            - NotBlank: ~
+        prixLocation:
+            - Positive: ~
+        etat:
+            - Choice:
+                  choices:
+                      - Disponible
+                      - Loue
+                      - En Panne
+        imageUrl:
+            - Length:
+                  max: 255
+
+App\Entity\Location:
+    constraints:
+        - Callback: validateDateRange
+    properties:
+        dateDebut:
+            - NotNull: ~
+        dateFin:
+            - NotNull: ~
+        montantTotal:
+            - PositiveOrZero: ~
+        statut:
+            - Choice:
+                  choices:
+                      - En cours
+                      - Terminee
+                      - Annulee
+        materiel:
+            - NotNull: ~
+        utilisateur:
+            - NotNull: ~
+
+App\Entity\Panne:
+    constraints:
+        - Callback: validateRepairDate
+    properties:
+        descriptionPanne:
+            - NotBlank: ~
+        datePanne:
+            - NotNull: ~
+        coutReparation:
+            - PositiveOrZero: ~
+        materiel:
+            - NotNull: ~
+        imageUrl:
+            - Length:
+                  max: 512

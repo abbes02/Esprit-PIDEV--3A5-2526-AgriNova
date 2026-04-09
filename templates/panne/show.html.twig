@@ -1,0 +1,209 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Panne #{{ panne.id }} - Détails{% endblock %}
+
+{% block body %}
+    {% set isResolved = panne.dateReparation is not null %}
+    {% set severityClass = panne.severity ?? 'minor' %}
+
+    <section class="card module-head">
+        <div>
+            <div class="module-title">
+                <span class="module-icon"><i class="fas fa-tools"></i></span>
+                <h1>Panne #{{ panne.id }}</h1>
+                <span class="status-pill {{ isResolved ? 'done' : 'incident' }}">
+                    {{ isResolved ? 'Résolu' : 'Ouvert' }}
+                </span>
+            </div>
+            <p class="module-sub">Détails complets de l'incident signalé</p>
+        </div>
+        <div class="actions">
+            <button type="button" class="button secondary" id="panne-export-pdf">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
+            <a class="button" href="{{ path('app_panne_edit', {'id': panne.id, 'user_id': current_user.id}) }}">
+                <i class="fas fa-edit"></i> Modifier
+            </a>
+            <a class="button secondary" href="{{ path('app_panne_index', {'user_id': current_user.id}) }}">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+    </section>
+
+    <div class="panne-detail-grid">
+        <section class="card panne-detail-main">
+            <h2 class="detail-section-title"><i class="fas fa-info-circle"></i> Informations</h2>
+            <table class="detail-table">
+                <tbody>
+                    <tr>
+                        <th><i class="fas fa-exclamation-triangle"></i> Sévérité</th>
+                        <td><span class="severity-badge {{ severityClass }}">{{ panne.severityLabel ?? 'Mineur' }}</span></td>
+                    </tr>
+                    <tr>
+                        <th><i class="fas fa-tag"></i> Type</th>
+                        <td>{{ panne.panneTypeLabel ?? 'Autre' }}</td>
+                    </tr>
+                    <tr>
+                        <th><i class="fas fa-tractor"></i> Matériel</th>
+                        <td>
+                            {% if panne.materiel %}
+                                <strong>{{ panne.materiel.nom }}</strong>
+                                <span class="muted"> — {{ panne.materiel.proprietaire ? (panne.materiel.proprietaire.prenom ~ ' ' ~ panne.materiel.proprietaire.nom)|trim : 'N/A' }}</span>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><i class="fas fa-calendar-times"></i> Date panne</th>
+                        <td>{{ panne.datePanne ? panne.datePanne|date('d/m/Y') : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th><i class="fas fa-calendar-check"></i> Date réparation</th>
+                        <td>{{ panne.dateReparation ? panne.dateReparation|date('d/m/Y') : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th><i class="fas fa-coins"></i> Coût réparation</th>
+                        <td>{{ panne.coutReparation is not null and panne.coutReparation > 0 ? panne.coutReparation|number_format(2, '.', ' ') ~ ' TND' : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th><i class="fas fa-money-bill-wave"></i> Coût estimé</th>
+                        <td>{{ panne.estimatedCost is not null ? panne.estimatedCost|number_format(2, '.', ' ') ~ ' TND' : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th><i class="fas fa-flag"></i> Priorité</th>
+                        <td>{{ panne.priority ?? '-' }} / 5</td>
+                    </tr>
+                    <tr>
+                        <th><i class="fas fa-user"></i> Signalé par</th>
+                        <td>{{ panne.reportedByName ?? '-' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="card panne-detail-desc">
+            <h2 class="detail-section-title"><i class="fas fa-align-left"></i> Description</h2>
+            <p class="panne-detail-text">{{ panne.descriptionPanne }}</p>
+
+            {% if panne.diagnosticSolution %}
+                <h2 class="detail-section-title" style="margin-top: 20px;"><i class="fas fa-lightbulb"></i> Diagnostic / Solution</h2>
+                <p class="panne-detail-text">{{ panne.diagnosticSolution }}</p>
+            {% endif %}
+        </section>
+    </div>
+
+    <div class="actions" style="margin-top: 20px;">
+        {% include 'panne/_delete_form.html.twig' %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+    <script>
+    (function() {
+        var btn = document.getElementById('panne-export-pdf');
+        if (!btn || !window.jspdf) return;
+
+        btn.addEventListener('click', function() {
+            var jsPDF = window.jspdf.jsPDF;
+            var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            var y = 20;
+            var pageW = doc.internal.pageSize.getWidth();
+
+            /* Header bar */
+            doc.setFillColor(29, 122, 67);
+            doc.rect(0, 0, pageW, 38, 'F');
+            doc.setFontSize(22);
+            doc.setTextColor(255);
+            doc.text('Rapport de Panne', 14, 18);
+            doc.setFontSize(12);
+            doc.text('Panne #{{ panne.id }}', 14, 28);
+            doc.setFontSize(10);
+            var today = new Date();
+            doc.text('Export\u00e9 le ' + today.toLocaleDateString('fr-FR'), pageW - 14, 28, { align: 'right' });
+            y = 48;
+
+            /* Status badge */
+            var isResolved = {{ panne.dateReparation is not null ? 'true' : 'false' }};
+            doc.setFontSize(11);
+            if (isResolved) {
+                doc.setFillColor(214, 245, 222);
+                doc.setTextColor(29, 122, 67);
+            } else {
+                doc.setFillColor(254, 226, 226);
+                doc.setTextColor(180, 30, 30);
+            }
+            var statusText = isResolved ? 'RESOLU' : 'OUVERT';
+            doc.roundedRect(14, y - 5, 30, 8, 2, 2, 'F');
+            doc.text(statusText, 16, y + 1);
+            y += 14;
+
+            /* Detail table */
+            doc.autoTable({
+                startY: y,
+                theme: 'plain',
+                columnStyles: {
+                    0: { cellWidth: 55, fontStyle: 'bold', textColor: [60, 60, 60] },
+                    1: { cellWidth: 'auto' }
+                },
+                bodyStyles: { fontSize: 10, cellPadding: 4 },
+                alternateRowStyles: { fillColor: [245, 250, 247] },
+                body: [
+                    ['S\u00e9v\u00e9rit\u00e9', {{ (panne.severityLabel ?? 'Mineur')|json_encode|raw }}],
+                    ['Type', {{ (panne.panneTypeLabel ?? 'Autre')|json_encode|raw }}],
+                    ['Mat\u00e9riel', {{ (panne.materiel ? panne.materiel.nom : 'N/A')|json_encode|raw }}],
+                    ['Propri\u00e9taire', {{ (panne.materiel and panne.materiel.proprietaire ? (panne.materiel.proprietaire.prenom ~ ' ' ~ panne.materiel.proprietaire.nom)|trim : 'N/A')|json_encode|raw }}],
+                    ['Date panne', {{ (panne.datePanne ? panne.datePanne|date('d/m/Y') : '-')|json_encode|raw }}],
+                    ['Date r\u00e9paration', {{ (panne.dateReparation ? panne.dateReparation|date('d/m/Y') : '-')|json_encode|raw }}],
+                    ['Co\u00fbt r\u00e9paration', {{ (panne.coutReparation is not null and panne.coutReparation > 0 ? panne.coutReparation ~ ' TND' : '-')|json_encode|raw }}],
+                    ['Co\u00fbt estim\u00e9', {{ (panne.estimatedCost is not null ? panne.estimatedCost ~ ' TND' : '-')|json_encode|raw }}],
+                    ['Priorit\u00e9', {{ ((panne.priority ?? '-') ~ ' / 5')|json_encode|raw }}],
+                    ['Signal\u00e9 par', {{ (panne.reportedByName ?? '-')|json_encode|raw }}]
+                ],
+                margin: { left: 14, right: 14 }
+            });
+
+            y = doc.lastAutoTable.finalY + 14;
+
+            /* Description */
+            doc.setFontSize(13);
+            doc.setTextColor(29, 75, 50);
+            doc.text('Description', 14, y);
+            y += 6;
+            doc.setFontSize(10);
+            doc.setTextColor(40, 40, 40);
+            var descLines = doc.splitTextToSize({{ panne.descriptionPanne|json_encode|raw }}, pageW - 28);
+            doc.text(descLines, 14, y);
+            y += descLines.length * 5 + 10;
+
+            {% if panne.diagnosticSolution %}
+            /* Diagnostic */
+            if (y > 260) { doc.addPage(); y = 20; }
+            doc.setFontSize(13);
+            doc.setTextColor(29, 75, 50);
+            doc.text('Diagnostic / Solution', 14, y);
+            y += 6;
+            doc.setFontSize(10);
+            doc.setTextColor(40, 40, 40);
+            var diagLines = doc.splitTextToSize({{ panne.diagnosticSolution|json_encode|raw }}, pageW - 28);
+            doc.text(diagLines, 14, y);
+            {% endif %}
+
+            /* Footer */
+            var totalPages = doc.internal.getNumberOfPages();
+            for (var i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(150);
+                doc.text('Agrinova - Rapport de panne #{{ panne.id }}', 14, 290);
+                doc.text('Page ' + i + '/' + totalPages, pageW - 14, 290, { align: 'right' });
+            }
+
+            doc.save('panne-{{ panne.id }}-' + today.toISOString().slice(0, 10) + '.pdf');
+        });
+    })();
+    </script>
+{% endblock %}

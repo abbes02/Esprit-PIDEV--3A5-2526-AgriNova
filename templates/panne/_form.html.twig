@@ -1,0 +1,113 @@
+{% set selectedUserId = (current_user is defined and current_user) ? current_user.id : app.request.query.get('user_id') %}
+{% set isLockedMateriel = lock_materiel|default(false) %}
+
+{{ form_start(form, {'attr': {'class': 'agri-form-shell panne-form'}}) }}
+    {% if form.vars.errors|length > 0 %}
+        <div class="alert alert-danger mb-3">
+            {{ form_errors(form) }}
+        </div>
+    {% endif %}
+
+    {% if isLockedMateriel %}
+        <div class="location-lock-note">
+            <i class="fas fa-lock"></i>
+            <div>
+                <strong>Matériel présélectionné</strong>
+                <p>Ce signalement est lié à votre location active. <a href="{{ path('app_location_index', selectedUserId ? {'user_id': selectedUserId} : {}) }}">Retour aux locations</a></p>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-tractor"></i> Matériel concerné</h3>
+        <div class="agri-form-grid">
+            <div class="form-col-12">
+                {{ form_label(form.materiel, null, {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(form.materiel) }}
+                <div class="field-errors">{{ form_errors(form.materiel) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-exclamation-triangle"></i> Classification de la panne</h3>
+        <div class="agri-form-grid">
+            <div class="form-col-12">
+                {{ form_label(form.severity, null, {'label_attr': {'class': 'field-label'}}) }}
+                <div class="severity-radio-wrapper">
+                    {% for child in form.severity %}
+                        {% set severityValue = child.vars.value %}
+                        <label class="severity-option severity-{{ severityValue }} {{ child.vars.checked ? 'is-selected' : '' }}">
+                            {{ form_widget(child) }}
+                            <span class="severity-icon">
+                                {% if severityValue == 'critical' %}
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                {% elseif severityValue == 'major' %}
+                                    <i class="fas fa-exclamation-circle"></i>
+                                {% else %}
+                                    <i class="fas fa-info-circle"></i>
+                                {% endif %}
+                            </span>
+                            <span class="severity-label">{{ child.vars.label }}</span>
+                            <span class="severity-desc">
+                                {% if severityValue == 'critical' %}
+                                    Arrêt total, danger
+                                {% elseif severityValue == 'major' %}
+                                    Impact important
+                                {% else %}
+                                    Fonctionnement réduit
+                                {% endif %}
+                            </span>
+                        </label>
+                    {% endfor %}
+                </div>
+                <div class="field-errors">{{ form_errors(form.severity) }}</div>
+            </div>
+
+            <div class="form-col-12">
+                {{ form_label(form.panneType, null, {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(form.panneType) }}
+                <div class="field-errors">{{ form_errors(form.panneType) }}</div>
+                <p class="muted field-help">Catégorie technique du problème</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3 class="form-section-title"><i class="fas fa-comment-alt"></i> Description du problème</h3>
+        <div class="agri-form-grid">
+            <div class="form-col-12">
+                {{ form_label(form.descriptionPanne, null, {'label_attr': {'class': 'field-label'}}) }}
+                {{ form_widget(form.descriptionPanne) }}
+                <div class="field-errors">{{ form_errors(form.descriptionPanne) }}</div>
+                <p class="muted field-help">Décrivez les symptômes, circonstances et tout détail utile</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions form-actions">
+        <button class="button">
+            <i class="fas fa-exclamation-circle"></i> {{ button_label|default('Signaler la panne') }}
+        </button>
+        <a class="button secondary" href="{{ path('app_panne_index', selectedUserId ? {'user_id': selectedUserId} : {}) }}">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+{{ form_end(form) }}
+
+<script>
+(function() {
+    const severityOptions = document.querySelectorAll('.severity-option');
+    severityOptions.forEach(option => {
+        const radio = option.querySelector('input[type="radio"]');
+        if (radio) {
+            radio.addEventListener('change', () => {
+                severityOptions.forEach(opt => opt.classList.remove('is-selected'));
+                if (radio.checked) {
+                    option.classList.add('is-selected');
+                }
+            });
+        }
+    });
+})();
+</script>

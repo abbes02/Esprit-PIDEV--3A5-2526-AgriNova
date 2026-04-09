@@ -1,0 +1,248 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Agriech | Smart Agriculture Experience{% endblock %}
+
+{% block body_class %}liste-produit-page{% endblock %}
+
+{% block stylesheets %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/StyleFront.css?v=20260409-1">
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/libs/gsap.min.js"></script>
+    <script src="/libs/ScrollTrigger.min.js"></script>
+    <script type="module" src="/liste-produit-agricole.js?v=20260409-1"></script>
+{% endblock %}
+
+{% block body %}
+    <!-- 3D canvas background -->
+    <canvas id="bg" aria-hidden="true"></canvas>
+
+    <!-- UI overlay -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <a class="app-name" href="{{ path('produit_iot_afficher') }}">AGRINOVA</a>
+            <span class="time" id="time">--:--</span>
+            <span class="temp">24&deg;C</span>
+        </div>
+        <div class="topbar-right">
+            <label class="sr-only" for="weather">Weather</label>
+            <select id="weather" class="glass-select">
+                <option>Ensoleill&eacute;</option>
+                <option>Nuageux</option>
+                <option>Pluvieux</option>
+                <option>Neigeux</option>
+            </select>
+
+            <label class="sr-only" for="timeOfDay">Time of day</label>
+            <select id="timeOfDay" class="glass-select">
+                <option>Matin</option>
+                <option>Coucher de soleil</option>
+                <option>Nuit</option>
+            </select>
+
+            <label class="sr-only" for="lang">Language</label>
+            <select id="lang" class="glass-select">
+                <option>Fran&ccedil;ais</option>
+                <option>English</option>
+                <option>Arabic</option>
+            </select>
+
+            <label class="sr-only" for="currency">Currency</label>
+            <select id="currency" class="glass-select">
+                <option>DT</option>
+                <option>USD</option>
+                <option>EUR</option>
+                <option>GBP</option>
+                <option>JPY</option>
+            </select>
+
+            <button class="glass-btn" type="button">ChatBot</button>
+            <a class="glass-btn primary" href="{{ path('liste_produit_agricole') }}">Login</a>
+            <a class="glass-btn" href="{{ path('panier_page') }}">Consulter Panier</a>
+            <a class="add-product-btn" href="{{ path('produit_agricole_ajouter') }}">
+                <img src="/box-3d.svg" alt="Ajouter produit" />
+                <span>Ajouter Produit</span>
+            </a>
+        </div>
+    </header>
+    <div class="search-card">
+        <form class="search-card-form" method="get" action="{{ path('liste_produit_agricole') }}">
+            <div class="search-card-field">
+                <label for="search-q">Recherche</label>
+                <input id="search-q" type="text" name="q" value="{{ search ?? '' }}" placeholder="Rechercher un produit..." />
+            </div>
+            <div class="search-card-field">
+                <label for="search-sort">Tri</label>
+                <select id="search-sort" name="sort">
+                    <option value="recent" {{ sort == 'recent' ? 'selected' : '' }}>Plus récents</option>
+                    <option value="price_asc" {{ sort == 'price_asc' ? 'selected' : '' }}>Prix croissant</option>
+                    <option value="price_desc" {{ sort == 'price_desc' ? 'selected' : '' }}>Prix décroissant</option>
+                    <option value="name_asc" {{ sort == 'name_asc' ? 'selected' : '' }}>Nom A-Z</option>
+                    <option value="name_desc" {{ sort == 'name_desc' ? 'selected' : '' }}>Nom Z-A</option>
+                </select>
+            </div>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchForm = document.querySelector('.search-card-form');
+            if (!searchForm) return;
+            const searchInput = searchForm.querySelector('#search-q');
+            const sortSelect = searchForm.querySelector('#search-sort');
+            let timer = null;
+
+            const submitForm = () => {
+                searchForm.submit();
+            };
+
+            if (sortSelect) {
+                sortSelect.addEventListener('change', submitForm);
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+                    timer = setTimeout(submitForm, 350);
+                });
+            }
+        });
+    </script>
+    {% for message in app.flashes('success') %}
+        <div class="toast-success" role="status">{{ message }}</div>
+    {% endfor %}
+    <div class="parcel-labels">
+        {% for produit in produits %}
+            <article
+                class="product-card parcel-card"
+                data-parcel-index="{{ loop.index0 }}"
+                data-nom="{{ produit.nom }}"
+                data-prix="{{ produit.prix is not null ? (produit.prix|number_format(2, '.', ' ') ~ ' DT') : 'Prix indisponible' }}"
+                data-ref="{{ produit.ref }}"
+                data-categorie="{{ produit.categorieAgricole ?? 'Non spécifiée' }}"
+                data-description="{{ produit.description ?? 'Aucune description' }}"
+                data-quantite="{{ produit.quantite ?? '—' }}"
+                data-image="{{ produit.image ? path('produit_agricole_image', { id: produit.id }) : '/logo.png' }}"
+                data-add-panier-url="{{ path('produit_agricole_add_panier', { id: produit.id }) }}"
+            >
+                <div class="product-thumb">
+                    <img
+                        src="{{ produit.image ? path('produit_agricole_image', { id: produit.id }) : '/logo.png' }}"
+                        alt="{{ produit.nom }}"
+                        loading="lazy"
+                    />
+                </div>
+                <h3>{{ produit.nom }}</h3>
+                <p>
+                    {{ produit.prix is not null ? (produit.prix|number_format(2, '.', ' ') ~ ' DT') : 'Prix indisponible' }}
+                </p>
+            </article>
+        {% else %}
+            <article class="product-card parcel-card" data-parcel-index="0">
+                <h3>Aucun produit</h3>
+                <p>Ajoutez des produits agricoles pour les afficher ici.</p>
+            </article>
+        {% endfor %}
+    </div>
+    <div class="popup-overlay" id="produitPopup" aria-hidden="true">
+        <div class="popup-card" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+            <button class="popup-close" type="button" aria-label="Fermer">×</button>
+            <div class="popup-media">
+                <img id="popupImage" src="/logo.png" alt="Produit" />
+            </div>
+            <div class="popup-body">
+                <h2 id="popupTitle">Produit</h2>
+                <p class="popup-price" id="popupPrice">--</p>
+                <div class="popup-meta">
+                    <span><strong>Réf:</strong> <span id="popupRef">--</span></span>
+                    <span><strong>Catégorie:</strong> <span id="popupCategorie">--</span></span>
+                    <span><strong>Quantité:</strong> <span id="popupQuantite">--</span></span>
+                </div>
+                <p class="popup-description" id="popupDescription">--</p>
+                <div class="popup-actions">
+                    <label class="popup-qty">
+                        <span>Quantité</span>
+                        <input id="popupQtyInput" type="number" min="1" value="1" />
+                    </label>
+                    <form id="popupBuyForm" method="post">
+                        <input type="hidden" name="quantite" id="popupQtyField" value="1" />
+                        <button class="popup-buy" type="submit">Acheter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <aside class="sidebar">
+        <div class="sidebar-logo-container">
+            <div class="sidebar-logo-circle">
+                <a href="{{ path('app_home') }}">
+                    <img src="/logo.png" alt="AGRINOVA logo" />
+                </a>
+            </div>
+            <div class="sidebar-logo-text">
+                <div class="sidebar-logo-label">AGRINOVA</div>
+                <div class="sidebar-subtitle">L'EXCELLENCE RURALE</div>
+            </div>
+        </div>
+
+        <div class="sidebar-separator"></div>
+
+        <nav class="sidebar-buttons">
+            <a class="sidebar-button" href="#">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/>
+                </svg>
+                Parcelles
+            </a>
+            <a class="sidebar-button" href="{{ path('produit_iot_list') }}">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2l7 4v6c0 5-3.8 9.7-7 10-3.2-.3-7-5-7-10V6l7-4z"/>
+                </svg>
+                Produits IOT
+            </a>
+            <a class="sidebar-button active" href="{{ path('liste_produit_agricole') }}">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3C7 3 4 7 4 11c0 4 3 7 8 10 5-3 8-6 8-10 0-4-3-8-8-8z"/>
+                </svg>
+                Produits Agricole
+            </a>
+            <a class="sidebar-button" href="#">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 7h16v10H4V7zm2-4h12v2H6V3zm2 14h8v2H8v-2z"/>
+                </svg>
+                Materiels
+            </a>
+            <a class="sidebar-button" href="#">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3l9 4-9 4-9-4 9-4zm-7 6v6l7 3 7-3V9l-7 3-7-3z"/>
+                </svg>
+                Formations
+            </a>
+            <a class="sidebar-button" href="#">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM7 12h5v5H7z"/>
+                </svg>
+                Evenements
+            </a>
+            <a class="sidebar-button" href="#">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 6h11v8H3V6zm12 2h3l3 3v3h-6V8zM6 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                </svg>
+                Livraison
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a class="sidebar-button logout" href="#">Deconnexion</a>
+        </div>
+    </aside>
+    <main class="ui"></main>
+{% endblock %}

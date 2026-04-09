@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+{% set disable_3d = true %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="/BackOffice.css?v=20260409-1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
+
+{% block body %}
+<div class="backoffice-page">
+    <header class="bo-topbar">
+        <div class="bo-topbar-left">
+            <a class="bo-brand-link" href="{{ path('app_home') }}">AGRINOVA</a>
+            <span class="bo-chip">BackOffice</span>
+        </div>
+        <div class="bo-topbar-right">
+            <div class="bo-search">
+                <input type="search" placeholder="Rechercher..." aria-label="Rechercher" class="bo-input" />
+            </div>
+            <div class="bo-user">
+                <div class="bo-user-avatar">
+                    <img src="/logo.png" alt="AGRINOVA" />
+                </div>
+                <div>
+                    <div class="bo-user-name">Equipe AGRINOVA</div>
+                    <div class="bo-user-role">Administration</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="bo-shell">
+        <aside class="bo-sidebar">
+            <div class="bo-brand">
+                <div class="bo-logo">AGRINOVA</div>
+                <div class="bo-subtitle">Pilotage & Inventaire</div>
+            </div>
+
+            <nav class="bo-nav">
+                <a class="bo-link {% if app.request.attributes.get('_route') == 'backoffice_produit_iot_afficher' %}active{% endif %}" href="{{ path('backoffice_produit_iot_afficher') }}">Produits IOT</a>
+                <a class="bo-link {% if app.request.attributes.get('_route') == 'liste_produit_agricole' %}active{% endif %}" href="{{ path('liste_produit_agricole') }}">Produits Agricoles</a>
+                <a class="bo-link {% if app.request.attributes.get('_route') == 'produit_iot_list' %}active{% endif %}" href="{{ path('produit_iot_list') }}">Vue 3D IOT</a>
+            </nav>
+
+            <div class="bo-side-footer">
+                <a class="bo-link" href="{{ path('app_home') }}">Retour site</a>
+            </div>
+        </aside>
+
+        <main class="bo-content">
+            {% block bo_content %}{% endblock %}
+        </main>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,256 @@
+﻿{% extends 'base.html.twig' %}
+
+{% block body_class %}liste-produit-page panier-page{% endblock %}
+
+{% block title %}Panier{% endblock %}
+
+
+
+{% block body %}
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<header class="topbar">
+    <div class="topbar-left">
+        <span class="app-name">AGRINOVA</span>
+        <span class="time" id="time">--:--</span>
+        <span class="temp">24&deg;C</span>
+    </div>
+    <div class="topbar-right">
+        <label class="sr-only" for="weather">Weather</label>
+        <select id="weather" class="glass-select">
+            <option>Ensoleill&eacute;</option>
+            <option>Nuageux</option>
+            <option>Pluvieux</option>
+            <option>Neigeux</option>
+        </select>
+
+        <label class="sr-only" for="timeOfDay">Time of day</label>
+        <select id="timeOfDay" class="glass-select">
+            <option>Matin</option>
+            <option>Coucher de soleil</option>
+            <option>Nuit</option>
+        </select>
+
+        <label class="sr-only" for="lang">Language</label>
+        <select id="lang" class="glass-select">
+            <option>Fran&ccedil;ais</option>
+            <option>English</option>
+            <option>Arabic</option>
+        </select>
+
+        <label class="sr-only" for="currency">Currency</label>
+        <select id="currency" class="glass-select">
+            <option>DT</option>
+            <option>USD</option>
+            <option>EUR</option>
+            <option>GBP</option>
+            <option>JPY</option>
+        </select>
+
+        <button class="glass-btn" type="button">ChatBot</button>
+        <a class="glass-btn primary" href="{{ path('liste_produit_agricole') }}">Login</a>
+        <a class="glass-btn" href="{{ path('panier_page') }}">Consulter Panier</a>
+    </div>
+</header>
+{% for message in app.flashes('success') %}
+    <div class="toast-success" role="status">{{ message }}</div>
+{% endfor %}
+
+<aside class="sidebar">
+    <div class="sidebar-logo-container">
+        <div class="sidebar-logo-circle">
+            <a href="{{ path('app_home') }}">
+                <img src="/logo.png" alt="AGRINOVA logo" />
+            </a>
+        </div>
+        <div class="sidebar-logo-text">
+            <div class="sidebar-logo-label">AGRINOVA</div>
+            <div class="sidebar-subtitle">L'EXCELLENCE RURALE</div>
+        </div>
+    </div>
+
+    <div class="sidebar-separator"></div>
+
+    <nav class="sidebar-buttons">
+        <a class="sidebar-button" href="#">
+            <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/>
+            </svg>
+            Parcelles
+        </a>
+        <a class="sidebar-button" href="{{ path('produit_iot_list') }}">
+            <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2l7 4v6c0 5-3.8 9.7-7 10-3.2-.3-7-5-7-10V6l7-4z"/>
+            </svg>
+            Produits IOT
+        </a>
+        <a class="sidebar-button" href="{{ path('liste_produit_agricole') }}">
+            <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3C7 3 4 7 4 11c0 4 3 7 8 10 5-3 8-6 8-10 0-4-3-8-8-8z"/>
+            </svg>
+            Produits Agricole
+        </a>
+        <a class="sidebar-button" href="#">
+            <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h16v10H4V7zm2-4h12v2H6V3zm2 14h8v2H8v-2z"/>
+            </svg>
+            Materiels
+        </a>
+        <a class="sidebar-button" href="#">
+            <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3l9 4-9 4-9-4 9-4zm-7 6v6l7 3 7-3V9l-7 3-7-3z"/>
+            </svg>
+            Formations
+        </a>
+        <a class="sidebar-button" href="#">
+            <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM7 12h5v5H7z"/>
+            </svg>
+            Evenements
+        </a>
+        <a class="sidebar-button" href="#">
+            <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 6h11v8H3V6zm12 2h3l3 3v3h-6V8zM6 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+            </svg>
+            Livraison
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <a class="sidebar-button logout" href="#">Deconnexion</a>
+    </div>
+</aside>
+
+<main class="ui">
+    <div class="login-wrap product-wrap" style="margin-top: 6rem;">
+        <div class="login-card product-card-shell agri-form-shell">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h1 class="mb-0">Mon Panier</h1>
+                <div class="detail-price">Total: {{ total|number_format(2, '.', ' ') }} DT</div>
+            </div>
+
+            <div class="d-flex justify-content-between mb-3">
+                <button class="glass-btn primary" type="button" id="openCommandePopup">Commander</button>
+                <a class="glass-btn" href="{{ path('panier_historique') }}">Historique</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-dark table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Image</th>
+                            <th>Prix</th>
+                            <th>Quantit&eacute;</th>
+                            <th>Date ajout</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ item.nom ?? 'Produit' }}</td>
+                            <td>
+                                {% if item.image %}
+                                    <img src="{{ path('produit_agricole_image', {'id': item.id_produit}) }}" alt="{{ item.nom }}" style="height:50px;">
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ item.prix ?? 0 }} DT</td>
+                            <td>{{ item.quantite }}</td>
+                            <td>{{ item.date_ajout }}</td>
+                            <td>{{ (item.prix ?? 0) * item.quantite }} DT</td>
+                            <td>
+                                <form method="post" action="{{ path('panier_delete', {'id': item.id_panier}) }}" onsubmit="return confirm('Supprimer cet article ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_panier_' ~ item.id_panier) }}">
+                                    <button class="btn btn-sm btn-danger">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">Panier vide</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<div class="popup-overlay" id="commandePopup" aria-hidden="true">
+    <div class="popup-card" role="dialog" aria-modal="true" aria-labelledby="commandeTitle">
+        <button class="popup-close" type="button" aria-label="Fermer">&times;</button>
+        <div class="popup-body">
+            <h2 id="commandeTitle">Confirmer votre commande</h2>
+            <p class="popup-price">Montant total: {{ total|number_format(2, '.', ' ') }} DT</p>
+            <div class="popup-3d-box">
+                <img src="/box-3d.svg" alt="Box 3D" class="popup-3d-image" />
+                <div class="popup-3d-products">
+                    {% for item in items %}
+                        <div class="popup-3d-thumb" title="{{ item.nom ?? 'Produit' }}">
+                            {% if item.image %}
+                                <img src="{{ path('produit_agricole_image', {'id': item.id_produit}) }}" alt="{{ item.nom }}">
+                            {% else %}
+                                <img src="/logo.png" alt="Produit">
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="popup-3d-thumb">
+                            <img src="/logo.png" alt="Produit">
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="popup-meta">
+                <span><strong>Localisation:</strong> {{ localisation ?? '-' }}</span>
+                <span><strong>T&eacute;l&eacute;phone:</strong> {{ telephone ?? '-' }}</span>
+            </div>
+            <div class="popup-actions">
+                <form method="post" action="{{ path('panier_confirmer') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('panier_confirmer') }}">
+                    <button class="popup-buy" type="submit">Confirmer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/libs/gsap.min.js"></script>
+    <script src="/libs/ScrollTrigger.min.js"></script>
+    <script type="module" src="/liste-produit-agricole.js?v=20260409-1"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const popup = document.getElementById('commandePopup');
+            const openBtn = document.getElementById('openCommandePopup');
+            const closeBtn = popup ? popup.querySelector('.popup-close') : null;
+
+            function openPopup() {
+                if (!popup) return;
+                popup.classList.add('is-open');
+                popup.setAttribute('aria-hidden', 'false');
+            }
+            function closePopup() {
+                if (!popup) return;
+                popup.classList.remove('is-open');
+                popup.setAttribute('aria-hidden', 'true');
+            }
+
+            if (openBtn) openBtn.addEventListener('click', openPopup);
+            if (closeBtn) closeBtn.addEventListener('click', closePopup);
+            if (popup) {
+                popup.addEventListener('click', (e) => {
+                    if (e.target === popup) closePopup();
+                });
+            }
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closePopup();
+            });
+        });
+    </script>
+{% endblock %}
+

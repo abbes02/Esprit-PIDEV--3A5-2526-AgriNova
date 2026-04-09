@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+{% set disable_3d = true %}
+
+{% block title %}AGRINOVA | Produits IOT{% endblock %}
+
+{% block body_class %}iot-list-body{% endblock %}
+
+{% block body %}
+<div class="iot-list-page">
+    <header class="iot-list-header">
+        <div>
+            <h1>Produits IOT</h1>
+            <p>Liste des capteurs et solutions connectees disponibles.</p>
+        </div>
+        <div class="iot-list-actions">
+            <a class="glass-btn" href="{{ path('panier_page') }}">Consulter panier</a>
+            <a class="glass-btn primary" href="{{ path('backoffice_produit_iot_ajouter') }}">Ajouter</a>
+        </div>
+    </header>
+
+    <section class="iot-list-grid">
+        {% for produit in produits %}
+            <article class="iot-card">
+                <div class="iot-card-media">
+                    {% if produit.image is not null %}
+                        <img src="{{ path('produit_iot_image', {'id': produit.id}) }}" alt="{{ produit.nom }}">
+                    {% else %}
+                        <div class="iot-card-placeholder">Sans image</div>
+                    {% endif %}
+                </div>
+                <div class="iot-card-body">
+                    <div class="iot-card-top">
+                        <h2>{{ produit.nom }}</h2>
+                        <span class="iot-tag">{{ produit.categorie ?? 'IOT' }}</span>
+                    </div>
+                    <div class="iot-card-meta">
+                        <div>
+                            <span>Ref</span>
+                            <strong>{{ produit.ref }}</strong>
+                        </div>
+                        <div>
+                            <span>Stock</span>
+                            <strong>{{ produit.quantite is not null ? produit.quantite : '-' }}</strong>
+                        </div>
+                        <div>
+                            <span>Prix</span>
+                            <strong>
+                                {% if produit.prix is not null %}
+                                    {{ produit.prix }} DT
+                                {% else %}
+                                    Prix indisponible
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                    <p class="iot-card-desc">
+                        {{ produit.description ?? 'Aucune description.' }}
+                    </p>
+                </div>
+            </article>
+        {% else %}
+            <div class="iot-empty">Aucun produit IOT trouve.</div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

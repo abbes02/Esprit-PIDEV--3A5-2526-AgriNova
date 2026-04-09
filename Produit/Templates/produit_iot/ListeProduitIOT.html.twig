@@ -1,0 +1,206 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Agriech | Liste des Produits IOT{% endblock %}
+
+{% block body %}
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<main class="ui product-space iot-page">
+    <header class="topbar">
+        <div class="topbar-left">
+            <a class="app-name app-name-link" href="{{ path('backoffice_produit_iot_afficher') }}">AGRINOVA</a>
+            <span class="time" id="time">--:--</span>
+            <span class="temp">24&deg;C</span>
+        </div>
+        <div class="topbar-right">
+            <label class="sr-only" for="weather">Weather</label>
+            <select id="weather" class="glass-select">
+                <option>Ensoleille</option>
+                <option>Nuageux</option>
+                <option>Pluvieux</option>
+                <option>Neigeux</option>
+            </select>
+
+            <label class="sr-only" for="timeOfDay">Time of day</label>
+            <select id="timeOfDay" class="glass-select">
+                <option>Matin</option>
+                <option>Coucher de soleil</option>
+                <option>Nuit</option>
+            </select>
+
+            <label class="sr-only" for="lang">Language</label>
+            <select id="lang" class="glass-select">
+                <option>Francais</option>
+                <option>English</option>
+                <option>Arabic</option>
+            </select>
+
+            <label class="sr-only" for="currency">Currency</label>
+            <select id="currency" class="glass-select">
+                <option>DT</option>
+                <option>USD</option>
+                <option>EUR</option>
+                <option>GBP</option>
+                <option>JPY</option>
+            </select>
+
+            <button class="glass-btn" type="button">ChatBot</button>
+            <a class="glass-btn" data-account-link href="{{ path('profile_produit_agricole') }}">Compte</a>
+            <a class="glass-btn" href="{{ path('panier_page') }}">Consulter panier</a>
+        </div>
+    </header>
+
+    <div class="parcel-labels">
+        {% for produit in produits %}
+            <button
+                type="button"
+                class="product-card parcel-card"
+                data-parcel-index="{{ loop.index0 }}"
+                data-id="{{ produit.id }}"
+                data-name="{{ produit.nom|e('html_attr') }}"
+                data-price="{{ produit.prix is not null ? (produit.prix ~ ' DT') : 'Prix indisponible' }}"
+                data-ref="{{ produit.ref|e('html_attr') }}"
+                data-categorie="{{ (produit.categorie ?? '-')|e('html_attr') }}"
+                data-stock="{{ produit.quantite is not null ? produit.quantite : '-' }}"
+                data-description="{{ (produit.description ?? 'Aucune description.')|e('html_attr') }}"
+                data-image="{{ produit.image is not null ? path('produit_iot_image', {'id': produit.id}) : '' }}"
+                onclick="openIotModal(this)"
+            >
+                <h3>{{ produit.nom }}</h3>
+                <p>
+                    {% if produit.prix is not null %}
+                        {{ produit.prix }} DT
+                    {% else %}
+                        Prix indisponible
+                    {% endif %}
+                </p>
+                <div class="parcel-image">
+                    {% if produit.image is not null %}
+                        <img src="{{ path('produit_iot_image', {'id': produit.id}) }}" alt="{{ produit.nom }}">
+                    {% else %}
+                        <span class="parcel-placeholder">Sans image</span>
+                    {% endif %}
+                </div>
+            </button>
+        {% endfor %}
+    </div>
+
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-logo-container">
+                <div class="sidebar-logo-circle">
+                    <a href="{{ path('app_home') }}">
+                        <img src="/logo.png" alt="AGRINOVA logo" />
+                    </a>
+                </div>
+                <div class="sidebar-logo-text">
+                    <div class="sidebar-logo-label">AGRINOVA</div>
+                    <div class="sidebar-subtitle">L'EXCELLENCE RURALE</div>
+                </div>
+            </div>
+
+            <div class="sidebar-separator"></div>
+
+            <nav class="sidebar-buttons">
+                <a class="sidebar-button" href="#">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/>
+                    </svg>
+                    Parcelles
+                </a>
+                <a class="sidebar-button active" href="{{ path('liste_produit_iot') }}">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 2l7 4v6c0 5-3.8 9.7-7 10-3.2-.3-7-5-7-10V6l7-4z"/>
+                    </svg>
+                    Produits IOT
+                </a>
+                <a class="sidebar-button" href="{{ path('liste_produit_agricole') }}">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 3C7 3 4 7 4 11c0 4 3 7 8 10 5-3 8-6 8-10 0-4-3-8-8-8z"/>
+                    </svg>
+                    Produits Agricoles
+                </a>
+                <a class="sidebar-button" href="#">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 7h16v10H4V7zm2-4h12v2H6V3zm2 14h8v2H8v-2z"/>
+                    </svg>
+                    Materiel
+                </a>
+                <a class="sidebar-button" href="#">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 3l9 4-9 4-9-4 9-4zm-7 6v6l7 3 7-3V9l-7 3-7-3z"/>
+                    </svg>
+                    Formations
+                </a>
+                <a class="sidebar-button" href="#">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10zM7 12h5v5H7z"/>
+                    </svg>
+                    Evenements
+                </a>
+                <a class="sidebar-button" href="#">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 6h11v8H3V6zm12 2h3l3 3v3h-6V8zM6 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 0a2 2 0 1 0 0 4 2 0 0 0 0-4z"/>
+                    </svg>
+                    Livraison
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a class="sidebar-button logout" href="#">Deconnexion</a>
+            </div>
+        </aside>
+    </div>
+</main>
+
+<div class="agri-modal" id="iot-modal" aria-hidden="true">
+    <div class="agri-modal__backdrop" data-close></div>
+    <div class="agri-modal__content" role="dialog" aria-modal="true" aria-labelledby="iot-modal-title">
+        <button class="agri-modal__close" type="button" data-close>X</button>
+        <div class="detail-card">
+            <div class="detail-grid">
+                <div class="detail-media">
+                    <img class="detail-image" id="iot-modal-image" alt="">
+                    <div class="detail-badges">
+                        <span class="detail-badge">IOT</span>
+                        <span class="detail-badge muted" id="iot-modal-categorie"></span>
+                    </div>
+                </div>
+                <div class="detail-content">
+                    <div class="detail-header">
+                        <h2 id="iot-modal-title">Produit</h2>
+                        <div class="detail-price" id="iot-modal-price"></div>
+                    </div>
+                    <div class="detail-meta">
+                        <div>
+                            <span class="detail-label">Reference</span>
+                            <span class="detail-value" id="iot-modal-ref"></span>
+                        </div>
+                        <div>
+                            <span class="detail-label">Stock</span>
+                            <span class="detail-value" id="iot-modal-stock"></span>
+                        </div>
+                    </div>
+                    <div class="detail-description">
+                        <span class="detail-label">Description</span>
+                        <p id="iot-modal-description"></p>
+                    </div>
+
+                    <form id="iot-modal-form" class="detail-actions" method="post">
+                        <label class="detail-label" for="iot-modal-qty">Quantite</label>
+                        <div class="detail-action-row">
+                            <input id="iot-modal-qty" name="quantite" type="number" min="1" value="1" class="detail-qty">
+                            <button type="submit" class="btn-primary">Acheter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="module" src="/liste-produit-iot.js?v=20260409-1"></script>
+{% endblock %}

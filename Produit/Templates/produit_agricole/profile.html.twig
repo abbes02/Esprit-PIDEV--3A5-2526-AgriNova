@@ -1,0 +1,219 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil | Produits Agricoles{% endblock %}
+
+{% block body %}
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<header class="topbar">
+    <div class="topbar-left">
+        <a class="app-name app-name-link" href="{{ path('backoffice_produit_iot_afficher') }}">AGRINOVA</a>
+        <span class="time" id="time">--:--</span>
+        <span class="temp">24&deg;C</span>
+    </div>
+    <div class="topbar-right">
+        <label class="sr-only" for="weather">Weather</label>
+        <select id="weather" class="glass-select">
+            <option>Ensoleille</option>
+            <option>Nuageux</option>
+            <option>Pluvieux</option>
+            <option>Neigeux</option>
+        </select>
+
+        <label class="sr-only" for="timeOfDay">Time of day</label>
+        <select id="timeOfDay" class="glass-select">
+            <option>Matin</option>
+            <option>Coucher de soleil</option>
+            <option>Nuit</option>
+        </select>
+
+        <label class="sr-only" for="lang">Language</label>
+        <select id="lang" class="glass-select">
+            <option>Francais</option>
+            <option>English</option>
+            <option>Arabic</option>
+        </select>
+
+        <label class="sr-only" for="currency">Currency</label>
+        <select id="currency" class="glass-select">
+            <option>DT</option>
+            <option>USD</option>
+            <option>EUR</option>
+            <option>GBP</option>
+            <option>JPY</option>
+        </select>
+
+        <button class="glass-btn" type="button">ChatBot</button>
+        <a class="glass-btn" data-account-link href="{{ path('profile_produit_agricole') }}">Compte</a>
+        <a class="glass-btn" href="{{ path('panier_consulter') }}">Consulter panier</a>
+
+        <div class="user-chip">
+            <div class="user-avatar">
+                <a href="{{ path('app_home') }}">
+                    <img src="/logo.png" alt="User avatar" />
+                </a>
+            </div>
+            <div class="user-meta">
+                <span class="user-name">Saidi Ben</span>
+                <span class="user-email">saidi@agrinova.tn</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="dashboard agri-sidebar-overlay">
+    <aside class="sidebar">
+        <div class="sidebar-logo-container">
+            <div class="sidebar-logo-circle">
+                <a href="{{ path('app_home') }}">
+                    <img src="/logo.png" alt="AGRINOVA logo" />
+                </a>
+            </div>
+            <div class="sidebar-logo-text">
+                <div class="sidebar-logo-label">AGRINOVA</div>
+                <div class="sidebar-subtitle">L'EXCELLENCE RURALE</div>
+            </div>
+        </div>
+
+        <div class="sidebar-separator"></div>
+
+        <nav class="sidebar-buttons">
+            <a class="sidebar-button" href="#">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-4 0-7 2-7 4v2h14v-2c0-2-3-4-7-4z"/>
+                </svg>
+                Mon Profile
+            </a>
+            <a class="sidebar-button" href="#">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/>
+                </svg>
+                Mes Parcelles
+            </a>
+            <a class="sidebar-button" href="#">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2c4 0 7 3 7 7 0 5-4 9-7 13-3-4-7-8-7-13 0-4 3-7 7-7z"/>
+                </svg>
+                Mes Plantes
+            </a>
+            <a class="sidebar-button active" href="{{ path('profile_produit_agricole') }}">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3C7 3 4 7 4 11c0 4 3 7 8 10 5-3 8-6 8-10 0-4-3-8-8-8z"/>
+                </svg>
+                Mes Produits
+            </a>
+            <a class="sidebar-button" data-command-link href="{{ path('profile_commande') }}">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 7h16v10H4V7zm2-4h12v2H6V3zm2 14h8v2H8v-2z"/>
+                </svg>
+                Mes Commandes
+            </a>
+            <a class="sidebar-button" href="#">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3l9 4-9 4-9-4 9-4zm-7 6v6l7 3 7-3V9l-7 3-7-3z"/>
+                </svg>
+                Mes Materiels
+            </a>
+            <a class="sidebar-button" href="#">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 7h16v10H4V7zm2-4h12v2H6V3zm2 14h8v2H8v-2z"/>
+                </svg>
+                Mes Formations
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a class="sidebar-button logout" href="#">Deconnexion</a>
+        </div>
+    </aside>
+</div>
+
+<aside class="notif-sidebar">
+    <div class="notif-header">
+        <div class="notif-title">Notifications</div>
+        <div class="notif-subtitle">Dernieres activites</div>
+    </div>
+    <div class="notif-list">
+        <div class="notif-item">
+            <div class="notif-dot"></div>
+            <div>
+                <div class="notif-text">Nouvelle commande en attente.</div>
+                <div class="notif-time">Il y a 5 min</div>
+            </div>
+        </div>
+        <div class="notif-item">
+            <div class="notif-dot"></div>
+            <div>
+                <div class="notif-text">Stock faible sur un produit.</div>
+                <div class="notif-time">Il y a 1 h</div>
+            </div>
+        </div>
+        <div class="notif-item">
+            <div class="notif-dot"></div>
+            <div>
+                <div class="notif-text">Nouveau message de support.</div>
+                <div class="notif-time">Hier</div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<main class="ui product-space agri-page">
+    <div class="profile-vbox">
+        {% if produits is empty %}
+            <div class="empty-state">
+                Aucun produit agricole pour ce compte.
+            </div>
+        {% else %}
+            {% for produit in produits %}
+                <div class="profile-item">
+                    <div class="profile-thumb">
+                        {% if produit.image is not null %}
+                            <img src="{{ path('produit_agricole_image', {'id': produit.id}) }}" alt="{{ produit.nom }}">
+                        {% else %}
+                            <span class="parcel-placeholder">Sans image</span>
+                        {% endif %}
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name">{{ produit.nom }}</div>
+                        <div class="profile-meta">
+                            {% if produit.prix is not null %}
+                                {{ produit.prix }} DT
+                            {% else %}
+                                Prix indisponible
+                            {% endif %}
+                        </div>
+                        <div class="profile-details">
+                            <div><span>Référence:</span> {{ produit.ref ?? '-' }}</div>
+                            <div><span>Catégorie:</span> {{ produit.categorieAgricole ?? '-' }}</div>
+                            <div><span>Stock:</span> {{ produit.quantite is not null ? produit.quantite : '-' }}</div>
+                            <div><span>Expiration:</span> {{ produit.dateExpiration ? produit.dateExpiration|date('Y-m-d') : '-' }}</div>
+                            <div><span>Description:</span> {{ produit.description ?? 'Aucune description.' }}</div>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <a class="profile-btn compare" href="#">Comparer Prix</a>
+                        <a class="profile-btn" href="{{ path('produit_edit', {'id': produit.id}) }}">Editer</a>
+                        <form method="post" action="{{ path('produit_delete', {'id': produit.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">
+                            <button class="profile-btn danger" type="submit">Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.body.classList.add('profile-page');
+        const topbar = document.querySelector('.topbar');
+        if (topbar) {
+            topbar.style.pointerEvents = 'auto';
+            topbar.style.zIndex = '9999';
+        }
+    });
+</script>
+<div class="scroll-space" aria-hidden="true"></div>
+{% endblock %}
